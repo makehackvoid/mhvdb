@@ -124,3 +124,33 @@ class MembershipExpiryTest(TestCase):
                       member=self.fred, payment_value="120", date=date(2011,5,1)).save()
         self.assertEqual(self.fred.expiry_date(), date(2011,10,30))
 
+
+
+class RecurringExpenseTest(TestCase):
+
+    """
+    Test cases for membership expiries
+    """
+    def setUp(self):
+        self.fred = dummy_member("Fred Durst")
+        self.fred.save()
+
+    def testYearly(self):
+        expense = RecurringExpense(description="Yearly payment of doom",
+                                   date=date(2011,1,1),
+                                   payment_type=CASH_PAYMENT,
+                                   period_unit="Year",
+                                   period=1)
+        forperiod = expense.expenses_for_period(date(2011,1,1), date(2011,10,1))
+        self.assertEqual(len(forperiod), 1)
+        self.assertEqual(forperiod[0].date, date(2011,1,1))
+
+        forperiod = expense.expenses_for_period(date(1995,1,1), date(2014,2,1))
+        self.assertEqual(len(forperiod), 4)
+        self.assertEqual(forperiod[3].date, date(2014,1,1))
+
+        expense.end_date = date(2012,2,1)
+        forperiod = expense.expenses_for_period(date(1995,1,1), date(2014,2,1))
+        self.assertEqual(len(forperiod), 2)
+        self.assertEqual(forperiod[1].date, date(2012,1,1))
+

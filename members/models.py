@@ -3,6 +3,10 @@ from datetime import date, datetime, timedelta
 from decimal import Decimal
 import math
 
+class Error(Exception):
+    """Base class for exceptions in this module."""
+    pass
+
 CASH_PAYMENT='C'
 BANK_PAYMENT='B'
 GRATIS='G'
@@ -82,6 +86,62 @@ class RecurringExpense(Expense):
     period_unit = models.TextField(choices=PERIOD)
     period = models.IntegerField()
     end_date = models.DateField(null=True, blank=True)
+
+    def expenses_for_period(self, start=None, end=None):
+        """
+        Return all of the payment dates for a particular period, as a list of RecurredExpenses
+        """
+        return list(self._expenses_for_period(start, end))
+    
+    def _expenses_for_period(self, start=None, end=None):
+        """
+        Return expenses for period as generator. Is wrapped into a list by expenses_for_period.
+        """
+        start = start or self.date
+        end = end or self.end_date
+        if end is None:
+            raise Error("Cannot get RecurringExpense over an open-ended period")
+        if end < start:
+            raise Error("RecurringExpense expenses_for_period end must be after start")
+        if self.period == 0:
+            raise Error("RecurringExpense must have a non-zero period count")
+
+        def fixup_date(year, month, day):
+            if month > 12:
+                return fixup_date(year+1, month-12, day)
+            try:
+                return date(year, month, day)
+            except ValueError as e:
+                if day > 0:
+                    return fixup_date(year,month,day-1)
+                else:
+                    raise e
+        next_fun = {
+            "Year" :  lambda d: fixup_date(d.year+self.period,d.month,start.day),
+            "Month" : lambda d: fixup_date(d.year,d.month+self.period,start.day),
+            "Day" :   lambda d: d + timedelta(days=self.period),
+            }[self.period_unit]
+
+        current = self.date
+        while current < end and (self.end_date is None or current < self.end_date):
+            if current >= start:
+                yield RecurredExpense(via_member=self.via_member,
+                                      description=self.description,
+                                      expense_value=self.expense_value,
+                                      date=current,
+                                      payment_type=self.payment_type)
+            current = next_fun(current)
+
+class RecurredExpense(Expense):
+    """
+    A dummy class for expenses generated from a RecurringExpense, with same fields as
+    Expense but not to be saved to a real database
+    """
+    def save(self):
+        raise Error("A RecurredExpense is read-only from a RecurringExpense and cannot be saved")
+    class Meta:
+        managed = False
+
 
 class Income(models.Model):
     description = models.TextField(blank=True)
