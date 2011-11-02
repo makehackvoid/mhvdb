@@ -1,0 +1,27 @@
+<p>
+{{count}} members of Make, Hack, Void.
+</p>
+
+<p>
+{% for type,count in counts %}
+{{count}} {{type}}</br>
+{% endfor %}
+</p>
+
+<table style="border-spacing: 8pt;">
+  <tr>
+	 <th><a href="members?sort=name">Full Name</a></th>
+	 <th><a href="members?sort=type">Membership Type</a></th>
+	 <th><a href="members?sort=expiry">Expires (Associate/Full)</a></th>
+	 <th><a href="members?sort=join">Join Date</a></th>
+  </tr>
+  {% for member in members %}
+  <tr>
+	 <td>{{member.fullname}}</td>
+	 <td>{{member.member_type}}</td>
+	 <td>{{member.expiry_date}}</td>
+	 <td>{{member.join_date}}</td>
+  </tr>
+  {% endfor %}
+</table>
+

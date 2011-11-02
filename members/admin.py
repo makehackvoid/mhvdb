@@ -1,0 +1,32 @@
+from members.models import *
+from django.contrib import admin
+
+class PhoneInline(admin.StackedInline):
+    model = Phone
+    extra = 1
+
+class EmailInline(admin.StackedInline):
+    model = Email
+    extra = 1
+
+class PaymentInline(admin.TabularInline):
+    model=MemberPayment
+    extra=0
+
+class MemberAdmin(admin.ModelAdmin):
+#    fieldsets = [
+#        (None,               {'fields': ['question']}),
+#        ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
+#    ]
+    list_display = ('fullname', 'join_date', 'member_type', 'expiry_date' )
+    inlines = [PhoneInline, EmailInline, PaymentInline ]
+
+admin.site.register(Member, MemberAdmin)
+
+
+admin.site.register(Membership)
+
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = ('member', 'membership_type', 'date', 'duration')
+admin.site.register(MemberPayment, PaymentAdmin)
+
