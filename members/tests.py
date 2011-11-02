@@ -36,19 +36,19 @@ class MembershipExpiryTest(TestCase):
         self.associate.save()
         self.full.save()
 
-        # Dummy membership cost structure - went up 1 June 2011
-        MembershipCost(membership=self.associate, monthly_cost="30", valid_from=date(2011,1,1)).save()
+        # Dummy membership cost structure - associate went up 1 June 2011, full came down(!)
+        MembershipCost(membership=self.associate, monthly_cost="20", valid_from=date(2011,1,1)).save()
         MembershipCost(membership=self.associate, monthly_cost="40", valid_from=date(2011,6,1)).save()
-        MembershipCost(membership=self.full, monthly_cost="90", valid_from=date(2011,1,1)).save()
-        MembershipCost(membership=self.full, monthly_cost="60", valid_from=date(2011,6,1)).save()
+        MembershipCost(membership=self.full, monthly_cost="100", valid_from=date(2011,1,1)).save()
+        MembershipCost(membership=self.full, monthly_cost="50", valid_from=date(2011,6,1)).save()
 
     def test_durations(self):
         """
         Test that the system knows what membership costs on various dates
         """
-        self.assertEqual( MembershipCost.objects.applicable_cost(self.associate, date(2011,2,1)).monthly_cost, 30 )
+        self.assertEqual( MembershipCost.objects.applicable_cost(self.associate, date(2011,2,1)).monthly_cost, 20 )
         self.assertEqual( MembershipCost.objects.applicable_cost(self.associate, date(2011,7,1)).monthly_cost, 40 )
-        self.assertEqual( MembershipCost.objects.applicable_cost(self.full, date(2012,1,1)).monthly_cost, 60 )
+        self.assertEqual( MembershipCost.objects.applicable_cost(self.full, date(2012,1,1)).monthly_cost, 50 )
 
 
     def test_auto_duration(self):
@@ -101,5 +101,26 @@ class MembershipExpiryTest(TestCase):
 
 
 
+    def test_pro_rata_over_rate_reduction(self):
+        """
+        If the membership rate goes down during a membership, the membership
+        should be pro rata extended to match the new value
+        """
 
+        # $200 buys 2 months on 1 May, but would buy 4 months on 1 June... so result
+        # should be 3 months
+        MemberPayment(membership_type=self.full,payment_type=BANK_PAYMENT,
+                      member=self.fred, payment_value="200", date=date(2011,5,1)).save()
+        self.assertEqual(self.fred.expiry_date(), date(2011,7,30))
+
+    def test_no_pro_rate_over_rate_hike(self):
+        """
+        OTOH, if the membership rate goes up during a membership, it's a bit rich to ask
+        for it to be pro rataed shorter - so we don't do that
+        """
+
+        # $120 buys 6 months on 1 May, and that's how it stays
+        MemberPayment(membership_type=self.associate,payment_type=BANK_PAYMENT,
+                      member=self.fred, payment_value="120", date=date(2011,5,1)).save()
+        self.assertEqual(self.fred.expiry_date(), date(2011,10,30))
 

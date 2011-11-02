@@ -112,24 +112,49 @@ class MemberPayment(models.Model):
 
     def duration(self):
         """ Calculate how many months of the given membership this buys
+            (can be fractional)
         """
-        cost = MembershipCost.objects.applicable_cost(self.membership_type, self.date)
-        result = self.free_months
-        if cost:
-            result += math.floor(Decimal(self.payment_value) / cost.monthly_cost)
-        return result
-
+        return MembershipCost.objects.applicable_duration(self.membership_type,
+                                                          self.date,
+                                                          self.payment_value)
 
 class CostManager(models.Manager):
     def applicable_cost(self, membership_type, date=date.today()):
         """
-        Return the cost applicable for a particular membership type, on a particular day
+        Return the monthly cost applicable for a particular membership type, on a particular day
         """
-        costs = self.filter(membership=membership_type, valid_from__lt=date).order_by("-valid_from")
+        costs = self.filter(membership=membership_type, valid_from__lte=date).order_by("-valid_from")
         if costs.count() == 0:
             return None
         else:
             return costs[0]
+
+
+    def applicable_duration(self, membership_type, date, payment):
+        """
+        Return the amount of time a payment is good for (in fractional months),
+        given a particular starting date and duration. Will pro rata across discounted rates.
+        """
+        payment=float(payment)
+        starter = self.applicable_cost(membership_type, date) # rate applying at start
+        changes = self.filter(membership=membership_type,
+                              valid_from__gt=date).order_by("valid_from") # rates applying thereafter
+        changes = [starter] + list(changes)
+        cost = float(starter.monthly_cost)
+        total = 0.0
+        for fr,to in ( (changes[i],changes[i+1]) for i in range(0,len(changes)-1) ):
+            period=to.valid_from-max(fr.valid_from, date)
+            period_months = float(period.days)/DAYS_PER_MONTH
+            cost = min(float(fr.monthly_cost), cost)
+            period_cost = period_months*cost
+            if period_cost > payment:
+                # this is more than our outstanding amount, so we're done
+                return total + payment/cost
+            else:
+                total += period_months
+                payment -= period_cost
+        # at end of list, so remainder is charged out at whatever rate applies at end
+        return total + payment/min(cost, float(changes[-1].monthly_cost))
 
 
 class MembershipCost(models.Model):
