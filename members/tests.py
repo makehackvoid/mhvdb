@@ -60,7 +60,7 @@ class MembershipExpiryTest(TestCase):
                                 member=self.fred, payment_value="480", date=date(2011,8,1)) # $40/mo * 12 months
         payment.save()
         payment = self.fred.memberpayment_set.all()[0]
-        self.assertEqual(payment.duration, 12)
+        self.assertEqual(payment.duration(), 12)
         self.assertEqual(self.fred.expiry_date(), date(2012,7,31))
 
     def test_renewal_before_expiry(self):

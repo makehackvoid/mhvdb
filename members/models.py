@@ -44,7 +44,7 @@ class Member(models.Model):
         months = 0
         start = self.join_date
         for payment in payments:
-            months += payment.duration
+            months += payment.duration()
             if not payment.continues_membership: # beginning
                 start = payment.date
                 break
@@ -98,23 +98,26 @@ class Membership(models.Model):
         return self.membership_name
 
 class MemberPayment(models.Model):
+    """
+    Any payment (or freebie) for an Associate or Full membership
+    """
     member = models.ForeignKey(Member)
     membership_type = models.ForeignKey(Membership)
     payment_type = models.CharField(max_length=20, choices=PAYMENT_TYPE)
     payment_value = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField()
-    duration = models.IntegerField()
+    # only set this for freebies, is calculated from payment_value otherwise
+    free_months = models.IntegerField(default=0)
     continues_membership = models.BooleanField()
 
-    def save(self, *args, **kwargs):
-        """ If saving with a payment_value and no duration, calculate the duration based
-        on the current going rate for that membership type
+    def duration(self):
+        """ Calculate how many months of the given membership this buys
         """
-        if not self.duration:
-            cost = MembershipCost.objects.applicable_cost(self.membership_type, self.date)
-            if cost:
-                self.duration = math.floor(Decimal(self.payment_value) / cost.monthly_cost)
-        super(MemberPayment, self).save(*args, **kwargs)
+        cost = MembershipCost.objects.applicable_cost(self.membership_type, self.date)
+        result = self.free_months
+        if cost:
+            result += math.floor(Decimal(self.payment_value) / cost.monthly_cost)
+        return result
 
 
 class CostManager(models.Manager):
