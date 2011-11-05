@@ -92,19 +92,24 @@ class RecurringExpense(Expense):
         Return all of the payment dates for a particular period, as a list of RecurredExpenses
         """
         return list(self._expenses_for_period(start, end))
-    
+
     def _expenses_for_period(self, start=None, end=None):
         """
         Return expenses for period as generator. Is wrapped into a list by expenses_for_period.
         """
-        start = start or self.date
-        end = end or self.end_date
+        if end is not None and start is not None and end < start:
+            raise Error("RecurringExpense expenses_for_period end must be after start")
+        if start is None:
+            start = self.date
+        if end is None:
+            end = self.end_date
         if end is None:
             raise Error("Cannot get RecurringExpense over an open-ended period")
-        if end < start:
-            raise Error("RecurringExpense expenses_for_period end must be after start")
         if self.period == 0:
             raise Error("RecurringExpense must have a non-zero period count")
+
+        if self.end_date is not None:
+            end = min(end, self.end_date)
 
         def fixup_date(year, month, day):
             if month > 12:
@@ -112,25 +117,29 @@ class RecurringExpense(Expense):
             try:
                 return date(year, month, day)
             except ValueError as e:
-                if day > 0:
+                if day > 1:
                     return fixup_date(year,month,day-1)
                 else:
                     raise e
-        next_fun = {
-            "Year" :  lambda d: fixup_date(d.year+self.period,d.month,start.day),
-            "Month" : lambda d: fixup_date(d.year,d.month+self.period,start.day),
-            "Day" :   lambda d: d + timedelta(days=self.period),
-            }[self.period_unit]
 
-        current = self.date
-        while current < end and (self.end_date is None or current < self.end_date):
-            if current >= start:
+        def get_iteration(n):
+            d = self.date
+            return {
+                "Year" :  fixup_date(d.year+self.period*n,d.month,d.day),
+                "Month" : fixup_date(d.year,d.month+self.period*n,d.day),
+                "Day" :   d + timedelta(days=self.period*n),
+                }[self.period_unit]
+
+        for n in xrange(1000000):
+            current = get_iteration(n)
+            if current > end:
+                return
+            elif current >= start:
                 yield RecurredExpense(via_member=self.via_member,
                                       description=self.description,
                                       expense_value=self.expense_value,
                                       date=current,
                                       payment_type=self.payment_type)
-            current = next_fun(current)
 
 class RecurredExpense(Expense):
     """
@@ -140,7 +149,7 @@ class RecurredExpense(Expense):
     def save(self):
         raise Error("A RecurredExpense is read-only from a RecurringExpense and cannot be saved")
     class Meta:
-        managed = False
+        managed = False # no db table for this one
 
 
 class Income(models.Model):

@@ -135,22 +135,75 @@ class RecurringExpenseTest(TestCase):
         self.fred = dummy_member("Fred Durst")
         self.fred.save()
 
+    def assertPeriod(self, expense, fromdate, todate, dates):
+        forperiod = expense.expenses_for_period(fromdate, todate)
+        self.assertEqual([p.date for p in forperiod], dates)
+
     def testYearly(self):
         expense = RecurringExpense(description="Yearly payment of doom",
                                    date=date(2011,1,1),
                                    payment_type=CASH_PAYMENT,
                                    period_unit="Year",
                                    period=1)
-        forperiod = expense.expenses_for_period(date(2011,1,1), date(2011,10,1))
-        self.assertEqual(len(forperiod), 1)
-        self.assertEqual(forperiod[0].date, date(2011,1,1))
 
-        forperiod = expense.expenses_for_period(date(1995,1,1), date(2014,2,1))
-        self.assertEqual(len(forperiod), 4)
-        self.assertEqual(forperiod[3].date, date(2014,1,1))
+        self.assertPeriod(expense, date(2011,1,1), date(2011,10,1), 
+                          [ date(2011,1,1) ])
+
+        self.assertPeriod(expense, date(1995,1,1), date(2014,2,1),
+                          [ date(2011,1,1), date(2012,1,1), date(2013,1,1),
+                            date(2014,1,1) ])
 
         expense.end_date = date(2012,2,1)
-        forperiod = expense.expenses_for_period(date(1995,1,1), date(2014,2,1))
-        self.assertEqual(len(forperiod), 2)
-        self.assertEqual(forperiod[1].date, date(2012,1,1))
+        self.assertPeriod(expense, date(1995,1,1), date(2014,2,1),
+                          [ date(2011,1,1), date(2012,1,1) ])
 
+    def testMonthly(self):
+        expense = RecurringExpense(description="Monthly doom dose",
+                                   date=date(2012,2,1),
+                                   payment_type=BANK_PAYMENT,
+                                   period_unit="Month",
+                                   period=1)
+        self.assertPeriod(expense, date(2012,1,1), date(2012,4,5),
+                          [ date(2012,2,1), date(2012,3,1), date(2012,4,1) ])
+
+        self.assertPeriod(expense, date(1995,1,1), date(2011,1,1), [])
+
+        expense.end_date = date(2012,4,1)
+        self.assertPeriod(expense, date(1995,1,1), date(2014,2,1),
+                         [ date(2012,2,1), date(2012,3,1), date(2012,4,1) ])
+
+    def testQuarterly(self):
+        expense = RecurringExpense(description="Quarterly anti-doom insurance",
+                                   date=date(2012,2,1),
+                                   payment_type=BANK_PAYMENT,
+                                   period_unit="Month",
+                                   period=3)
+        self.assertPeriod(expense, date(2012,1,1), date(2013,1,1),
+                          [ date(2012,2,1), date(2012,5,1), date(2012,8,1),
+                            date(2012,11,1) ])
+
+        expense.end_date = date(2012,3,1)
+        self.assertPeriod(expense, date(2012,1,1), date(2013,1,1),
+                          [ date(2012,2,1) ])
+
+    def testWeekly(self):
+        expense = RecurringExpense(description="Weekly cola supply",
+                                   date=date(2011,11,5), # Sat
+                                   payment_type=BANK_PAYMENT,
+                                   period_unit="Day",
+                                   period=7)
+        self.assertPeriod(expense, date(2012,1,1), date(2012,3,1),
+                          [ date(2012,1,7), date(2012,1,14), # all saturdays
+                            date(2012,1,21), date(2012,1,28), date(2012,2,4),
+                            date(2012,2,11), date(2012,2,18), date(2012,2,25) ])
+
+    def testLastDayOfMonth(self):
+        """ A monthly payment should adjust around short months """
+        expense = RecurringExpense(description="Last day of month tax",
+                                   date=date(2012,1,31),
+                                   payment_type=BANK_PAYMENT,
+                                   period_unit="Month",
+                                   period=1)
+        self.assertPeriod(expense, date(2012,1,1), date(2012,5,1),
+                          [ date(2012,1,31), date(2012,2,29), date(2012,3,31),
+                            date(2012,4,30) ])
