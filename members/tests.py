@@ -207,3 +207,40 @@ class RecurringExpenseTest(TestCase):
         self.assertPeriod(expense, date(2012,1,1), date(2012,5,1),
                           [ date(2012,1,31), date(2012,2,29), date(2012,3,31),
                             date(2012,4,30) ])
+
+
+class TestBalanceSheetFunctions(TestCase):
+    def testCombiningExpenses(self):
+        RecurringExpense(description="Last day of month tax",
+                         date=date(2012,1,31),
+                         payment_type=BANK_PAYMENT,
+                         payment_value=66,
+                         period_unit="Month",
+                         period=1).save()
+        RecurringExpense(description="Annual filing cost",
+                         date=date(2012,7,1),
+                         payment_type=CASH_PAYMENT,
+                         payment_value=150,
+                         period_unit="Year",
+                         period=1).save()
+        Expense(description="Cheese",
+                date=date(2012,6,5),
+                payment_type=BANK_PAYMENT,
+                payment_value=3.30).save()
+        Expense(description="Crackers",
+                date=date(2012,4,5),
+                payment_type=BANK_PAYMENT,
+                payment_value=2.50).save()
+
+        allexpenses = Expense.objects.all_expenses_for_period( date(2012,3,1), date(2012,8,1) )
+        self.assertEqual([(e.date,float(e.payment_value)) for e in allexpenses],
+                         [ (date(2012,3,31), 66), # tax
+                           (date(2012,4,5) , 2.50), # crackers
+                           (date(2012,4,30), 66), # tax
+                           (date(2012,5,31), 66), # tax
+                           (date(2012,6,5), 3.30), # cheese
+                           (date(2012,6,30), 66), # tax
+                           (date(2012,7,1), 150), # filing cost
+                           (date(2012,7,31), 66), # tax
+                           ])
+

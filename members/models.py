@@ -70,12 +70,38 @@ class Email(models.Model):
     email = models.CharField(max_length=50)
     is_preferred = models.BooleanField(default=True)
 
+class ExpenseManager(models.Manager):
+
+    def all_expenses_for_period(self, from_date, to_date):
+        """
+        Return a list of all expenses for a given date - both simple single Expenses
+        and RecurredExpenses
+
+        Data comes back sorted by date, can't do sorting in DB because not all info is there.
+        """
+        simple = list(self.filter(date__gte=from_date,
+                             date__lte=to_date).order_by("date"))
+        recurring = list(RecurringExpense.objects.all().order_by("date"))
+
+        # this is a bodgy hack to deal with model inheritance (remove any recurring ids)
+        # there is probably a better way to do this
+        recurring_ids = set([ r.id for r in recurring ])
+        simple = [ s for s in simple if s.id not in recurring_ids ] # remove recurring
+
+        for r in recurring:
+            simple += r.expenses_for_period(from_date,to_date)
+        return sorted(simple, key=lambda e:e.date)
+
 class Expense(models.Model):
     via_member = models.ForeignKey(Member, null=True, blank=True)
     description = models.TextField()
-    expense_value = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_value = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField()
     payment_type = models.CharField(max_length=1, choices=PAYMENT_TYPE)
+    objects = ExpenseManager()
+
+    def __unicode__(self):
+        return "Expense %s $%s '%s'" % (self.date, self.payment_value, self.description)
 
 class RecurringExpense(Expense):
     PERIOD=[
@@ -86,6 +112,12 @@ class RecurringExpense(Expense):
     period_unit = models.TextField(choices=PERIOD)
     period = models.IntegerField()
     end_date = models.DateField(null=True, blank=True)
+
+    def __unicode__(self):
+        return "Recurring Expense %s->%s $%s '%s'" % (self.date,
+                                                      self.end_date if seld.end_date is not None
+                                                      else "",
+                                                      self.payment_value, self.description)
 
     def expenses_for_period(self, start=None, end=None):
         """
@@ -137,9 +169,10 @@ class RecurringExpense(Expense):
             elif current >= start:
                 yield RecurredExpense(via_member=self.via_member,
                                       description=self.description,
-                                      expense_value=self.expense_value,
+                                      payment_value=self.payment_value,
                                       date=current,
                                       payment_type=self.payment_type)
+
 
 class RecurredExpense(Expense):
     """
@@ -198,7 +231,6 @@ class CostManager(models.Manager):
         else:
             return costs[0]
 
-
     def applicable_duration(self, membership_type, date, payment):
         """
         Return the amount of time a payment is good for (in fractional months),
@@ -224,7 +256,6 @@ class CostManager(models.Manager):
                 payment -= period_cost
         # at end of list, so remainder is charged out at whatever rate applies at end
         return total + payment/min(cost, float(changes[-1].monthly_cost))
-
 
 class MembershipCost(models.Model):
     membership = models.ForeignKey(Membership)
