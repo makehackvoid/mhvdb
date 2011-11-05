@@ -116,21 +116,25 @@ class RecurringExpense(Expense):
                     return fixup_date(year,month,day-1)
                 else:
                     raise e
-        next_fun = {
-            "Year" :  lambda d: fixup_date(d.year+self.period,d.month,start.day),
-            "Month" : lambda d: fixup_date(d.year,d.month+self.period,start.day),
-            "Day" :   lambda d: d + timedelta(days=self.period),
-            }[self.period_unit]
 
-        current = self.date
-        while current < end and (self.end_date is None or current < self.end_date):
-            if current >= start:
+        def get_iteration(n):
+            d = start
+            return {
+                "Year" :  fixup_date(d.year+self.period*n,d.month,start.day),
+                "Month" : fixup_date(d.year,d.month+self.period*n,start.day),
+                "Day" :   d + timedelta(days=self.period*n),
+                }[self.period_unit]
+
+        for n in xrange(100000000000):
+            current = get_iteration(n)
+            if current > end or (self.end_date is not None and current > self.end_date):
+                return
+            elif current >= start:
                 yield RecurredExpense(via_member=self.via_member,
                                       description=self.description,
                                       expense_value=self.expense_value,
                                       date=current,
                                       payment_type=self.payment_type)
-            current = next_fun(current)
 
 class RecurredExpense(Expense):
     """
