@@ -23,10 +23,19 @@ class MemberAdmin(admin.ModelAdmin):
 
 admin.site.register(Member, MemberAdmin)
 
+class MembershipCostInline(admin.TabularInline):
+    model = MembershipCost
+    extra = 1
 
-admin.site.register(Membership)
+class MembershipAdmin(admin.ModelAdmin):
+    inlines = [ MembershipCostInline ]
+admin.site.register(Membership, MembershipAdmin)
 
 class PaymentAdmin(admin.ModelAdmin):
     list_display = ('member', 'membership_type', 'date', 'duration')
 admin.site.register(MemberPayment, PaymentAdmin)
+
+admin.site.register(Donation)
+admin.site.register(Expense)
+admin.site.register(RecurringExpense)
 

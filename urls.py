@@ -8,6 +8,8 @@ urlpatterns = patterns('',
     # Example:
     # (r'^mhvdb/', include('mhvdb.foo.urls')),
     (r'^members$', 'members.views.members'),
+    (r'^balance$', 'members.views.balance'),
+    (r'^$',        'members.views.default'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),

@@ -3,7 +3,8 @@ import datetime, csv, sys
 from django.core.management.base import BaseCommand, CommandError
 from members.models import *
 
-EPOCH=datetime.datetime.strptime("1/1/2000", "%d/%m/%Y")
+from datetime import date,datetime
+EPOCH=date(2000,1,1)
 
 class Command(BaseCommand):
     args = '<csv-path>'
@@ -26,9 +27,16 @@ class Command(BaseCommand):
                     continue
                 except Member.DoesNotExist:
                     pass
+
+                try:
+                    joindate=datetime.strptime(fields[0], "%d/%m/%Y")
+                except ValueError:
+                    print "Failed to convert date %s" % fields[0]
+                    joindate=EPOCH
+
                 member = Member(first_name=name[0], 
                                 last_name=" ".join(name[1:]), 
-                                join_date=EPOCH,
+                                join_date=joindate,
                                 address=fields[4],
                                 emergency_contact_name=fields[8],
                                 emergency_contact_number=fields[9],
@@ -40,39 +48,6 @@ class Command(BaseCommand):
                 phone = Phone(member=member, phone_number=fields[7])
                 email.save()
                 phone.save()
-
-
-                memtype=fields[11].replace(" Member", "").replace("Student", "Concession")
-                memtype=Membership.objects.get(membership_name=memtype)
-                
-                paytype= fields[13] if len(fields) > 13 else "Bank"
-                if "free" in paytype:
-                    continue # only George, not worth automating
-                if paytype == "" or paytype.startswith("Bank"):
-                    paytype = 'Bank Transfer'
-                else:
-                    paytype = 'Cash'
-                
-                print fields
-                duration={
-                    "Six Months" : 6,
-                    "Three Months" : 3,
-                    "One Month" : 1 }.get(fields[12] if len(fields)>12 else "", "0")
-
-                try:
-                    joindate=datetime.datetime.strptime(fields[0], "%d/%m/%Y")
-                except ValueError:
-                    joindate=EPOCH
-
-                dummypayment=MemberPayment(member=member,
-                                           membership_type=memtype,
-                                           payment_type=paytype,
-                                           payment_value=-1,
-                                           date=joindate,
-                                           duration=duration,
-                                           continues_membership=False)
-                dummypayment.save()
-                
 
             finally:
                 pass

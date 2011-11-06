@@ -12,8 +12,8 @@ BANK_PAYMENT='B'
 GRATIS='G'
 
 PAYMENT_TYPE = [
-    ('C', 'Cash'),
-    ('B', 'Bank Transfer'),
+    ('C', 'Cash Transfer'),
+    ('B', 'Electronic Transfer'),
     ('G', 'Gratis')
 ]
 
@@ -37,7 +37,7 @@ class Member(models.Model):
         return self.fullname()
 
     def fullname(self):
-        return "%s %s" % (self.first_name, self.last_name)
+        return "%s, %s" % (self.last_name, self.first_name)
 
     def expiry_date(self):
         """
@@ -48,6 +48,8 @@ class Member(models.Model):
         months = 0
         start = self.join_date
         for payment in payments:
+            if payment.duration() is None:
+                continue
             months += payment.duration()
             if not payment.continues_membership: # beginning
                 start = payment.date
@@ -63,6 +65,9 @@ class Member(models.Model):
             return Membership.objects.get(membership_name="Casual")
         else:
             return payments[0].membership_type
+
+    class Meta:
+        ordering = ["last_name", "first_name"]
 
 
 class Email(models.Model):
@@ -98,6 +103,7 @@ class Expense(models.Model):
     payment_value = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField()
     payment_type = models.CharField(max_length=1, choices=PAYMENT_TYPE)
+
     objects = ExpenseManager()
 
     def __unicode__(self):
@@ -134,14 +140,14 @@ class RecurringExpense(Expense):
         if start is None:
             start = self.date
         if end is None:
-            end = self.end_date
+            end = self.end_date+timedelta(days=1)
         if end is None:
             raise Error("Cannot get RecurringExpense over an open-ended period")
         if self.period == 0:
             raise Error("RecurringExpense must have a non-zero period count")
 
         if self.end_date is not None:
-            end = min(end, self.end_date)
+            end = min(end, self.end_date+timedelta(days=1))
 
         def fixup_date(year, month, day):
             if month > 12:
@@ -164,7 +170,7 @@ class RecurringExpense(Expense):
 
         for n in xrange(1000000):
             current = get_iteration(n)
-            if current > end:
+            if current >= end:
                 return
             elif current >= start:
                 yield RecurredExpense(via_member=self.via_member,
@@ -183,6 +189,7 @@ class RecurredExpense(Expense):
         raise Error("A RecurredExpense is read-only from a RecurringExpense and cannot be saved")
     class Meta:
         managed = False # no db table for this one
+        proxy = True
 
 
 class Income(models.Model):
@@ -198,6 +205,19 @@ class Membership(models.Model):
 
     def __unicode__(self):
         return self.membership_name
+
+
+class Donation(models.Model):
+    """
+    Any payment that wasn't for membership
+    """
+    payment_type = models.CharField(max_length=20, choices=PAYMENT_TYPE)
+    payment_value = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateField()
+    description = models.TextField()
+
+    def __unicode__(self):
+        return "Donation $%s %s from %s" % (self.payment_value, self.date, self.description)
 
 class MemberPayment(models.Model):
     """
@@ -220,6 +240,10 @@ class MemberPayment(models.Model):
                                                           self.date,
                                                           self.payment_value)
 
+    def __unicode__(self):
+        return "Payment $%s %s from %s (%s)" % (self.payment_value, self.date,
+                                                self.member, self.membership_type)
+
 class CostManager(models.Manager):
     def applicable_cost(self, membership_type, date=date.today()):
         """
@@ -238,6 +262,8 @@ class CostManager(models.Manager):
         """
         payment=float(payment)
         starter = self.applicable_cost(membership_type, date) # rate applying at start
+        if starter is None:
+            return None
         changes = self.filter(membership=membership_type,
                               valid_from__gt=date).order_by("valid_from") # rates applying thereafter
         changes = [starter] + list(changes)
@@ -262,6 +288,9 @@ class MembershipCost(models.Model):
     monthly_cost = models.DecimalField(max_digits=10, decimal_places=2)
     valid_from = models.DateField()
     objects = CostManager()
+
+    class Meta:
+        ordering = [ "valid_from" ]
 
 class Phone(models.Model):
     member = models.ForeignKey(Member)

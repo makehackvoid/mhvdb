@@ -1,0 +1,51 @@
+{% load humanize %}
+
+<p>
+Balance Sheet {{date_from}} -> {{date_to}}
+</p>
+
+<p>
+<table style="border-spacing: 8pt;">
+  <tr>
+	 <td>Net Income</td>
+	 <td>${{income|intcomma}}</td>
+  </tr>
+  <tr>
+	 <td>Net Expense</td>
+	 <td>${{expense|intcomma}}</td>
+  </tr>
+  <tr>
+	 <td>Balance</td>
+	 <td>${{balance|intcomma}}</td>
+  </tr>
+</table>
+</p>
+
+<table style="border-spacing: 8pt;">
+  <tr>
+	 <th><a href="balance">Date</a></th>
+	 <th><a href="balance">Amount</a></th>
+	 <th><a href="balance">Payment Type</a></th>
+	 <th><a href="balance">Description</a></th>
+  </tr>
+  {% for item in items %}
+  <tr>
+	 <td>{{item.date}}</td>
+	 {% if item in expenses %}
+	 <td>-{{item.payment_value}}</td>
+	 <td>{{item.payment_type}}</td>
+	 <td>{{item.description}}</td>
+
+	 {% else %} {# is payment or donation #}
+	 <td>${{item.payment_value|intcomma}}</td>
+	 <td>{{item.payment_type}}</td>
+	 {% if item in memberpayments %}
+	 <td>Membership {{item.membership}} from {{item.member}}</td>
+	 {% else %} {# donation #}
+	 <td>Donation: {{item.description}}
+	 {% endif %}
+	 {% endif %}
+  </tr>
+  {% endfor %}
+</table>
+
