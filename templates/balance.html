@@ -71,26 +71,25 @@ To: <input class="picker" type="text" id="to" value="{{date_to|date:"Y-m-d"}}" /
 	 <tr>
 		<th><a href="balance">Date</a></th>
 		<th><a href="balance">Amount</a></th>
-		<th><a href="balance">Payment Type</a></th>
 		<th><a href="balance">Description</a></th>
+		<th><a href="balance">Paid Via</a></th>
 	 </tr>
 	 {% for item in items %}
 	 <tr>
 		<td>{{item.date}}</td>
 		{% if item in expenses %}
-		<td>-${{item.payment_value}}</td>
-		<td>{{item.payment_type}}</td>
+		<td style="color:red;">-${{item.payment_value}}</td>
 		<td>{{item.description}}</td>
 
 		{% else %} {# is payment or donation #}
 		<td>${{item.payment_value|intcomma}}</td>
-		<td>{{item.payment_type}}</td>
 		{% if item in memberpayments %}
 		<td>Membership {{item.membership}} from {{item.member}}</td>
 		{% else %} {# donation #}
-		<td>Donation: {{item.description}}
+		<td>Donation: {{item.description}}</td>
 		  {% endif %}
 		  {% endif %}
+		<td>{{item.get_payment_type_display}}</td>
 	 </tr>
 	 {% endfor %}
   </table>
