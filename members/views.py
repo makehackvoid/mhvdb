@@ -28,8 +28,14 @@ def balance(request):
     Display a balance sheet
     """
 
-    date_from=date(2010,1,1)  # TODO: use a form to choose these!
-    date_to=date.today()
+    def parse_date(string, default):
+        """ should probably be using Django Forms for all this """
+        try:
+            return datetime.strptime(string, "%Y-%m-%d").date()
+        except ValueError as e:
+            return default
+    date_from = parse_date(request.GET.get("from", ""), date(2010,12,1))
+    date_to = parse_date(request.GET.get("to", ""), date.today())
 
     expenses = list(Expense.objects.all_expenses_for_period(date_from, date_to))
     donations = list(Donation.objects.filter(date__gte=date_from, date__lt=date_to))
@@ -37,7 +43,10 @@ def balance(request):
 
     income = sum(p.payment_value for p in memberpayments + donations)
     expense = sum(e.payment_value for e in expenses)
-    balance = income - expense
+
+    period_balance = income - expense
+    start_balance = Expense.objects.balance_at_date(date_from)
+    end_balance = period_balance + start_balance
 
     items = sorted(expenses + memberpayments + donations, key=lambda e:e.date)
 

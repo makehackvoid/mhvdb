@@ -1,51 +1,88 @@
 {% load humanize %}
+<!DOCTYPE html>
+<html>
 
-<p>
-Balance Sheet {{date_from}} -> {{date_to}}
-</p>
+<head>
+  <title>Balance Sheet {{date_from}} -> {{date_to}}</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" media="all"></link>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.min.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+  <script type="text/javascript">
+	 $(function(){
 
-<p>
-<table style="border-spacing: 8pt;">
-  <tr>
-	 <td>Net Income</td>
-	 <td>${{income|intcomma}}</td>
-  </tr>
-  <tr>
-	 <td>Net Expense</td>
-	 <td>${{expense|intcomma}}</td>
-  </tr>
-  <tr>
-	 <td>Balance</td>
-	 <td>${{balance|intcomma}}</td>
-  </tr>
-</table>
-</p>
+	   $(".picker").datepicker({ dateFormat: 'yy-mm-dd' });
 
-<table style="border-spacing: 8pt;">
-  <tr>
-	 <th><a href="balance">Date</a></th>
-	 <th><a href="balance">Amount</a></th>
-	 <th><a href="balance">Payment Type</a></th>
-	 <th><a href="balance">Description</a></th>
-  </tr>
-  {% for item in items %}
-  <tr>
-	 <td>{{item.date}}</td>
-	 {% if item in expenses %}
-	 <td>-{{item.payment_value}}</td>
-	 <td>{{item.payment_type}}</td>
-	 <td>{{item.description}}</td>
+	   $(".picker").change(function(){
+	     window.location.search = "from=" + $("#from").val() +
+	                          "&to=" + $("#to").val();
+        });
+	 });
+  </script>
+</head>
 
-	 {% else %} {# is payment or donation #}
-	 <td>${{item.payment_value|intcomma}}</td>
-	 <td>{{item.payment_type}}</td>
-	 {% if item in memberpayments %}
-	 <td>Membership {{item.membership}} from {{item.member}}</td>
-	 {% else %} {# donation #}
-	 <td>Donation: {{item.description}}
-	 {% endif %}
-	 {% endif %}
-  </tr>
-  {% endfor %}
-</table>
+  <table>
+	 <tr><td>From:</td><td><input class="picker" type="text" id="from" value="{{date_from|date:"Y-m-d"}}"></input></td></tr>
+	 <tr><td>To:</td><td><input class="picker" type="text" id="to" value="{{date_to|date:"Y-m-d"}}"></input></td></tr>
+  </table>
 
+  <h1>
+	 Balance Sheet {{date_from}} -> {{date_to}}
+  </h1>
+
+  <p>
+	 <table style="border-spacing: 8pt;">
+		<tr>
+		  <td>Starting Balance</td>
+		  <td>${{start_balance|intcomma}}</td>
+		</tr>
+		<tr>
+		  <td>Period Income</td>
+		  <td>${{income|intcomma}}</td>
+		</tr>
+		<tr>
+		  <td>Period Expense</td>
+		  <td>${{expense|intcomma}}</td>
+		</tr>
+		<tr>
+		  <td>Period Balance</td>
+		  <td>${{period_balance|intcomma}}</td>
+		</tr>
+		<tr>
+		  <td>End Balance</td>
+		  <td>${{end_balance|intcomma}}</td>
+		</tr>
+
+	 </table>
+  </p>
+
+  <table style="border-spacing: 8pt;">
+	 <tr>
+		<th><a href="balance">Date</a></th>
+		<th><a href="balance">Amount</a></th>
+		<th><a href="balance">Payment Type</a></th>
+		<th><a href="balance">Description</a></th>
+	 </tr>
+	 {% for item in items %}
+	 <tr>
+		<td>{{item.date}}</td>
+		{% if item in expenses %}
+		<td>-${{item.payment_value}}</td>
+		<td>{{item.payment_type}}</td>
+		<td>{{item.description}}</td>
+
+		{% else %} {# is payment or donation #}
+		<td>${{item.payment_value|intcomma}}</td>
+		<td>{{item.payment_type}}</td>
+		{% if item in memberpayments %}
+		<td>Membership {{item.membership}} from {{item.member}}</td>
+		{% else %} {# donation #}
+		<td>Donation: {{item.description}}
+		  {% endif %}
+		  {% endif %}
+	 </tr>
+	 {% endfor %}
+  </table>
+
+</body>
+</html>

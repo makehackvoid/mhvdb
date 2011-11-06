@@ -97,6 +97,13 @@ class ExpenseManager(models.Manager):
             simple += r.expenses_for_period(from_date,to_date)
         return sorted(simple, key=lambda e:e.date)
 
+    def balance_at_date(self, at_date):
+        expenses = list(Expense.objects.all_expenses_for_period(date(2010,1,1), at_date))
+        donations = list(Donation.objects.filter(date__lt=at_date))
+        memberpayments = list(MemberPayment.objects.filter(date__lt=at_date))
+        return sum(p.payment_value for p in memberpayments + donations) - sum(e.payment_value for e in expenses)
+
+
 class Expense(models.Model):
     via_member = models.ForeignKey(Member, null=True, blank=True)
     description = models.TextField()
@@ -257,7 +264,7 @@ class CostManager(models.Manager):
 
     def applicable_duration(self, membership_type, date, payment):
         """
-        Return the amount of time a payment is good for (in fractional months),
+        Return the amount of time a payment is good for (in months, as a float)
         given a particular starting date and duration. Will pro rata across discounted rates.
         """
         payment=float(payment)
