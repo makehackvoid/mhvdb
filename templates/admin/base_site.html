@@ -1,0 +1,16 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}MHV Member Admin{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">{% trans 'MHV Administration' %}</h1>
+{% endblock %}
+
+{% block nav-global %}
+<a href="{%url members.views.default %}">Home</a>
+<a href="{%url admin:index %}">Admin</a>
+<a href="{%url members.views.members %}">Member Roster</a>
+<a href="{%url members.views.balance %}">Balance Sheet</a>
+{% endblock %}
+

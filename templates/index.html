@@ -1,8 +1,10 @@
+{% extends "admin/base_site.html" %}
 {% load humanize %}
 
-<p>
+{% block content %}
+<h1>
 MHVDB
-</p>
+</h1>
 
 <p>
 <a href="admin/">Admin Interface</a> (for adding data)<br/>
@@ -11,4 +13,6 @@ MHVDB
 </p>
 
 <p>Last piece of financial information (payments, expenses) is dated {{last_modified}}</p>
+
+{% endblock %}
 

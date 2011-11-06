@@ -1,3 +1,9 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}Member Roster{% endblock %}
+
+{% block content %}
+
 <p>
 {{count}} members of Make, Hack, Void.
 </p>
@@ -25,3 +31,4 @@
   {% endfor %}
 </table>
 
+{% endblock %}
