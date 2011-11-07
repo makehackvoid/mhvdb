@@ -35,7 +35,9 @@ class PaymentAdmin(admin.ModelAdmin):
     list_display = ('member', 'membership_type', 'date', 'duration')
 admin.site.register(MemberPayment, PaymentAdmin)
 
-admin.site.register(Donation)
+admin.site.register(Income)
+admin.site.register(IncomeCategory)
 admin.site.register(Expense)
+admin.site.register(ExpenseCategory)
 admin.site.register(RecurringExpense)
 

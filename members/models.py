@@ -99,9 +99,18 @@ class ExpenseManager(models.Manager):
 
     def balance_at_date(self, at_date):
         expenses = list(Expense.objects.all_expenses_for_period(date(2010,1,1), at_date))
-        donations = list(Donation.objects.filter(date__lt=at_date))
+        income = list(Income.objects.filter(date__lt=at_date))
         memberpayments = list(MemberPayment.objects.filter(date__lt=at_date))
-        return sum(p.payment_value for p in memberpayments + donations) - sum(e.payment_value for e in expenses)
+        return sum(p.payment_value for p in memberpayments + income) - sum(e.payment_value for e in expenses)
+
+
+class ExpenseCategory(models.Model):
+    name = models.CharField(max_length=30)
+    def __unicode__(self):
+        return self.name
+    class Meta:
+        ordering = [ "name" ]
+        verbose_name_plural = "Expense Categories"
 
 
 class Expense(models.Model):
@@ -110,11 +119,12 @@ class Expense(models.Model):
     payment_value = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField()
     payment_type = models.CharField(max_length=1, choices=PAYMENT_TYPE)
+    category = models.ForeignKey(ExpenseCategory)
 
     objects = ExpenseManager()
 
     def __unicode__(self):
-        return "Expense %s $%s '%s'" % (self.date, self.payment_value, self.description)
+        return "%s -$%s %s %s" % (self.date, self.payment_value, self.category.name, self.description)
 
 class RecurringExpense(Expense):
     PERIOD=[
@@ -199,13 +209,6 @@ class RecurredExpense(Expense):
         proxy = True
 
 
-class Income(models.Model):
-    description = models.TextField(blank=True)
-    from_member = models.ForeignKey(Member, null=True, blank=True)
-    payment_type = models.TextField(choices=PAYMENT_TYPE)
-    payment_value = models.DecimalField(max_digits=10, decimal_places=2)
-    date = models.DateField()
-
 class Membership(models.Model):
     membership_name = models.CharField(max_length=30)
     membership_description = models.TextField(blank=True)
@@ -214,27 +217,45 @@ class Membership(models.Model):
         return self.membership_name
 
 
-class Donation(models.Model):
+class BaseIncome(models.Model):
     """
-    Any payment that wasn't for membership
+    Any payment received
     """
     payment_type = models.CharField(max_length=20, choices=PAYMENT_TYPE)
     payment_value = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField()
-    description = models.TextField()
 
     def __unicode__(self):
-        return "Donation $%s %s from %s" % (self.payment_value, self.date, self.description)
+        return "%s $%s" % (self.date, self.payment_value)
 
-class MemberPayment(models.Model):
+    class Meta:
+        abstract = True
+
+class IncomeCategory(models.Model):
+    name = models.CharField(max_length=30)
+    def __unicode__(self):
+        return self.name
+    class Meta:
+        ordering = [ "name" ]
+        verbose_name_plural = "Income Categories"
+
+
+class Income(BaseIncome):
+    """
+    Any payment received which is not for a member
+    """
+    description = models.TextField()
+    category = models.ForeignKey(IncomeCategory)
+
+    def __unicode__(self):
+        return "%s $%s (%s %s)" % (self.date, self.payment_value, self.category.name, self.description)
+
+class MemberPayment(BaseIncome):
     """
     Any payment (or freebie) for an Associate or Full membership
     """
-    member = models.ForeignKey(Member)
+    member = models.ForeignKey(Member) 
     membership_type = models.ForeignKey(Membership)
-    payment_type = models.CharField(max_length=20, choices=PAYMENT_TYPE)
-    payment_value = models.DecimalField(max_digits=10, decimal_places=2)
-    date = models.DateField()
     # only set this for freebies, is calculated from payment_value otherwise
     free_months = models.IntegerField(default=0)
     continues_membership = models.BooleanField()

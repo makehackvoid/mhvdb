@@ -38,17 +38,17 @@ def balance(request):
     date_to = parse_date(request.GET.get("to", ""), date.today())
 
     expenses = list(Expense.objects.all_expenses_for_period(date_from, date_to))
-    donations = list(Donation.objects.filter(date__gte=date_from, date__lt=date_to))
+    income_items = list(Income.objects.filter(date__gte=date_from, date__lt=date_to))
     memberpayments = list(MemberPayment.objects.filter(date__gte=date_from, date__lt=date_to))
 
-    income = sum(p.payment_value for p in memberpayments + donations)
+    income = sum(p.payment_value for p in memberpayments + income_items)
     expense = sum(e.payment_value for e in expenses)
 
     period_balance = income - expense
     start_balance = Expense.objects.balance_at_date(date_from)
     end_balance = period_balance + start_balance
 
-    items = sorted(expenses + memberpayments + donations, key=lambda e:e.date)
+    items = sorted(expenses + memberpayments + income_items, key=lambda e:e.date)
 
     return render_to_response('balance.html', locals())
 
@@ -59,7 +59,7 @@ def default(request):
     """
 
     lastexpense = Expense.objects.order_by("-date")[0]
-    lastdonation = Donation.objects.order_by("-date")[0]
+    lastdonation = Income.objects.order_by("-date")[0]
     memberpayments = MemberPayment.objects.order_by("-date")[0]
 
     last_modified = max(lastexpense.date, lastdonation.date, memberpayments.date)
