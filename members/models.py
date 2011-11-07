@@ -138,7 +138,7 @@ class RecurringExpense(Expense):
 
     def __unicode__(self):
         return "Recurring Expense %s->%s $%s '%s'" % (self.date,
-                                                      self.end_date if seld.end_date is not None
+                                                      self.end_date if self.end_date is not None
                                                       else "",
                                                       self.payment_value, self.description)
 
