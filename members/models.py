@@ -263,7 +263,7 @@ class MemberPayment(BaseIncome):
     membership_type = models.ForeignKey(Membership)
     # only set this for freebies, is calculated from payment_value otherwise
     free_months = models.IntegerField(default=0)
-    continues_membership = models.BooleanField()
+    continues_membership = models.BooleanField(default=True)
 
     def duration(self):
         """ Calculate how many months of the given membership this buys
