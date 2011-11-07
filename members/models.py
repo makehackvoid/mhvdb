@@ -194,7 +194,8 @@ class RecurringExpense(Expense):
                                       description=self.description,
                                       payment_value=self.payment_value,
                                       date=current,
-                                      payment_type=self.payment_type)
+                                      payment_type=self.payment_type,
+                                      category=self.category)
 
 
 class RecurredExpense(Expense):
