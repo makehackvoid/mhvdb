@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     (r'^members$', 'members.views.members'),
     (r'^balance$', 'members.views.balance'),
     (r'^$',        'members.views.default'),
+    (r'^report$',        'members.views.financial_report'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),

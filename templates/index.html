@@ -7,9 +7,10 @@ MHVDB
 </h1>
 
 <p>
-<a href="admin/">Admin Interface</a> (for adding data)<br/>
-<a href="balance">Balance Sheet View</a><br/>
-<a href="members">Member Summary</a><br/>
+<a href="{%url admin:index %}">Admin Interface</a> (for adding data)<br/>
+<a href="{%url members.views.balance %}">Balance Sheet View</a><br/>
+<a href="{%url members.views.members %}">Member Summary</a><br/>
+<a href="{%url members.views.financial_report %}">Financial Report</a><br/>
 </p>
 
 <p>Last piece of financial information (payments, expenses) is dated {{last_modified}}</p>

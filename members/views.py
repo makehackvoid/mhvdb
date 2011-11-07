@@ -23,19 +23,20 @@ def members(request):
     return render_to_response("members.html", locals())
 
 
+def _parse_date(string, default):
+    """ should probably be using Django Forms for all this """
+    try:
+        return datetime.strptime(string, "%Y-%m-%d").date()
+    except ValueError as e:
+        return default
+
 def balance(request):
     """
     Display a balance sheet
     """
 
-    def parse_date(string, default):
-        """ should probably be using Django Forms for all this """
-        try:
-            return datetime.strptime(string, "%Y-%m-%d").date()
-        except ValueError as e:
-            return default
-    date_from = parse_date(request.GET.get("from", ""), date(2010,12,1))
-    date_to = parse_date(request.GET.get("to", ""), date.today())
+    date_from = _parse_date(request.GET.get("from", ""), date(2010,12,1))
+    date_to = _parse_date(request.GET.get("to", ""), date.today())
 
     expenses = list(Expense.objects.all_expenses_for_period(date_from, date_to))
     income_items = list(Income.objects.filter(date__gte=date_from, date__lt=date_to))
@@ -52,6 +53,32 @@ def balance(request):
 
     return render_to_response('balance.html', locals())
 
+
+def financial_report(request):
+    """
+    Display something approximating an end of financial year report
+    """
+
+    date_from = _parse_date(request.GET.get("from", ""), date(2010,7,1))
+    date_to = _parse_date(request.GET.get("to", ""), date(2011,7,1))
+
+    # income
+    income_items = list(Income.objects.filter(date__gte=date_from, date__lt=date_to))
+    income_by_category = {}
+    for category in set(p.category for p in income_items):
+        income_by_category[category] = sum(i.payment_value for i in income_items if i.category == category)
+    income_by_category["Membership Payments"] = sum(i.payment_value for i in MemberPayment.objects.filter(date__gte=date_from, date__lt=date_to))
+
+    income_total = sum(i for i in ( l for l in income_by_category.values() ))
+    
+    # expenses
+    expense_items = list(Expense.objects.all_expenses_for_period(date_from, date_to))
+    expense_by_category = {}
+    for category in set(e.category for e in expense_items):
+        expense_by_category[category] = sum(e.payment_value for e in expense_items if e.category == category)
+    expense_total = sum(e.payment_value for e in expense_items)
+
+    return render_to_response('financial_report.html', locals())
 
 def default(request):
     """

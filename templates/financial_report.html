@@ -1,0 +1,37 @@
+{% load humanize %}
+<html>
+<head>
+<title>Financial Report</title>
+<style type="text/css">
+  td.money {text-align: right;}
+  td.bold {font-weight: bold;}
+</style>
+</head>
+
+<body>
+
+
+<h1>Financial Report {{date_from.year}} - {{date_to.year}}</h1>
+
+<h2>Income & Expenditure</h2>
+
+<h3>Income</h3>
+<table>
+{% for cat,total in income_by_category.items %}
+  <tr><td>{{cat}}</td><td class="money">${{total|intcomma}}</td></tr>
+{% endfor %}
+  <tr><td class="bold">Total Income</td><td class="money">${{income_total|intcomma}}</td></tr>
+</table>
+
+<h3>Expenditure</h3>
+<table>
+  {% for cat,total in expense_by_category.items %}
+  <tr><td>{{cat}}</td><td class="money">${{total|intcomma}}</td></tr>
+  {% endfor %}
+  <tr><td class="bold">Total Expenditure</td><td class="money">${{expense_total|intcomma}}</td></tr>
+</table>
+
+
+
+</body>
+</html>
