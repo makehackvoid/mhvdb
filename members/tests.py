@@ -211,26 +211,34 @@ class RecurringExpenseTest(TestCase):
 
 class TestBalanceSheetFunctions(TestCase):
     def testCombiningExpenses(self):
+        tax = ExpenseCategory(name="Tax")
+        tax.save()
+        food = ExpenseCategory(name="Food")
+        food.save()
         RecurringExpense(description="Last day of month tax",
                          date=date(2012,1,31),
                          payment_type=BANK_PAYMENT,
                          payment_value=66,
                          period_unit="Month",
+                         category=tax,
                          period=1).save()
         RecurringExpense(description="Annual filing cost",
                          date=date(2012,7,1),
                          payment_type=CASH_PAYMENT,
                          payment_value=150,
                          period_unit="Year",
+                         category=tax,
                          period=1).save()
         Expense(description="Cheese",
                 date=date(2012,6,5),
                 payment_type=BANK_PAYMENT,
-                payment_value=3.30).save()
+                payment_value=Decimal("3.30"),
+                category=food).save()
         Expense(description="Crackers",
                 date=date(2012,4,5),
                 payment_type=BANK_PAYMENT,
-                payment_value=2.50).save()
+                payment_value=Decimal("2.50"),
+                category=food).save()
 
         allexpenses = Expense.objects.all_expenses_for_period( date(2012,3,1), date(2012,8,1) )
         self.assertEqual([(e.date,float(e.payment_value)) for e in allexpenses],
