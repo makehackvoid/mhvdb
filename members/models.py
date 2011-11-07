@@ -126,6 +126,9 @@ class Expense(models.Model):
     def __unicode__(self):
         return "%s -$%s %s %s" % (self.date, self.payment_value, self.category.name, self.description)
 
+    class Meta:
+        ordering = [ "-date" ] 
+
 class RecurringExpense(Expense):
     PERIOD=[
         ("Year", "Year"),
@@ -231,6 +234,7 @@ class BaseIncome(models.Model):
 
     class Meta:
         abstract = True
+        ordering = [ "-date" ]
 
 class IncomeCategory(models.Model):
     name = models.CharField(max_length=30)
@@ -272,6 +276,9 @@ class MemberPayment(BaseIncome):
     def __unicode__(self):
         return "Payment $%s %s from %s (%s)" % (self.payment_value, self.date,
                                                 self.member, self.membership_type)
+
+    class Meta:
+        ordering = [ "-date" ] 
 
 class CostManager(models.Manager):
     def applicable_cost(self, membership_type, date=date.today()):
