@@ -132,7 +132,7 @@ class RecurringExpense(Expense):
         ("Month", "Month"),
         ("Day",   "Day"),
         ]
-    period_unit = models.TextField(choices=PERIOD)
+    period_unit = models.CharField(max_length=10, choices=PERIOD)
     period = models.IntegerField()
     end_date = models.DateField(null=True, blank=True)
 
