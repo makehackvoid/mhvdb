@@ -17,6 +17,7 @@
 <table style="border-spacing: 8pt;">
   <tr>
 	 <th><a href="members?sort=name">Full Name</a></th>
+	 <th>Edit</th>
 	 <th><a href="members?sort=type">Membership Type</a></th>
 	 <th><a href="members?sort=expiry">Expires (Associate/Full)</a></th>
 	 <th><a href="members?sort=join">Join Date</a></th>
@@ -24,6 +25,7 @@
   {% for member in members %}
   <tr>
 	 <td>{{member.fullname}}</td>
+	 <td><a href="{%url admin:members_member_change member.id%}">(edit)</a></td>
 	 <td>{{member.member_type}}</td>
 	 <td>{{member.expiry_date}}</td>
 	 <td>{{member.join_date}}</td>
