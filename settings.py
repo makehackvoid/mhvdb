@@ -1,5 +1,10 @@
 # Django settings for mhvdb project.
 
+# If you have settings that are specific to your local install (like DATABASES
+# or paths to templates, etc. then put them in a modify() method in
+# local_settings, as shown at http://stackoverflow.com/q/2086802
+import local_settings
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -99,3 +104,5 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
+
+local_settings.modify(globals())
