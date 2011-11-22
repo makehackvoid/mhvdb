@@ -171,6 +171,8 @@ class RecurringExpenseTest(TestCase):
         self.fred = dummy_member("Fred Durst")
         self.fred.save()
 
+        self.doom = ExpenseCategory(name="doom")
+
     def assertPeriod(self, expense, fromdate, todate, dates):
         forperiod = expense.expenses_for_period(fromdate, todate)
         self.assertEqual([p.date for p in forperiod], dates)
@@ -180,7 +182,7 @@ class RecurringExpenseTest(TestCase):
                                    date=date(2011,1,1),
                                    payment_type=CASH_PAYMENT,
                                    period_unit="Year",
-                                   period=1)
+                                   period=1, category=self.doom)
 
         self.assertPeriod(expense, date(2011,1,1), date(2011,10,1), 
                           [ date(2011,1,1) ])
@@ -198,7 +200,7 @@ class RecurringExpenseTest(TestCase):
                                    date=date(2012,2,1),
                                    payment_type=BANK_PAYMENT,
                                    period_unit="Month",
-                                   period=1)
+                                   period=1, category=self.doom)
         self.assertPeriod(expense, date(2012,1,1), date(2012,4,5),
                           [ date(2012,2,1), date(2012,3,1), date(2012,4,1) ])
 
@@ -213,7 +215,7 @@ class RecurringExpenseTest(TestCase):
                                    date=date(2012,2,1),
                                    payment_type=BANK_PAYMENT,
                                    period_unit="Month",
-                                   period=3)
+                                   period=3, category=self.doom)
         self.assertPeriod(expense, date(2012,1,1), date(2013,1,1),
                           [ date(2012,2,1), date(2012,5,1), date(2012,8,1),
                             date(2012,11,1) ])
@@ -227,7 +229,7 @@ class RecurringExpenseTest(TestCase):
                                    date=date(2011,11,5), # Sat
                                    payment_type=BANK_PAYMENT,
                                    period_unit="Day",
-                                   period=7)
+                                   period=7, category=self.doom)
         self.assertPeriod(expense, date(2012,1,1), date(2012,3,1),
                           [ date(2012,1,7), date(2012,1,14), # all saturdays
                             date(2012,1,21), date(2012,1,28), date(2012,2,4),
@@ -239,7 +241,7 @@ class RecurringExpenseTest(TestCase):
                                    date=date(2012,1,31),
                                    payment_type=BANK_PAYMENT,
                                    period_unit="Month",
-                                   period=1)
+                                   period=1, category=self.doom)
         self.assertPeriod(expense, date(2012,1,1), date(2012,5,1),
                           [ date(2012,1,31), date(2012,2,29), date(2012,3,31),
                             date(2012,4,30) ])
