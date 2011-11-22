@@ -162,6 +162,20 @@ class MembershipExpiryTest(TestCase):
         self.assertEqual(self.fred.expiry_date(), date(2011,7,29))
 
 
+    def test_free_membership(self):
+        """
+        Free membership should count as if it was a payment
+        """
+        MemberPayment(membership_type=self.full,payment_type=BANK_PAYMENT,
+                      member=self.fred, payment_value="200", date=date(2011,3,1),
+                      continues_membership=False).save()
+        MemberPayment(membership_type=self.full,payment_type=BANK_PAYMENT,
+                      member=self.fred, payment_value="0", date=date(2011,4,1), free_months=2,
+                      continues_membership=True).save()
+        self.assertEqual(self.fred.expiry_date(), date(2011,6,30))
+
+
+
 class RecurringExpenseTest(TestCase):
 
     """

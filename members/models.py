@@ -45,18 +45,20 @@ class Member(models.Model):
         """
         payments = self.memberpayment_set.order_by("date")
         # walk forwards through payments, tracking expiration
-        months = 0
+        months = 0.0
         start = self.join_date
         for payment in payments:
             if payment.duration() is None:
                 continue
             if not payment.continues_membership: # beginning
                 start = payment.date
-                months = 0
+                months = 0.0
 
             months += MembershipCost.objects.applicable_duration(payment.membership_type,
                                                                      start + delta_months(months),
                                                                      payment.payment_value)
+            if payment.free_months:
+                months += payment.free_months
         return start + delta_months(months)
 
     def member_type(self):
