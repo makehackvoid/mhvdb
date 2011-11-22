@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.cache import cache
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 import math
@@ -43,6 +44,10 @@ class Member(models.Model):
         """
         Return the expiry date for this member's full or associate membership
         """
+        cached = cache.get("membershipexpiry-%d" % self.id)
+        if cached is not None:
+            return cached
+
         payments = self.memberpayment_set.order_by("date")
         # walk forwards through payments, tracking expiration
         months = 0.0
@@ -59,7 +64,10 @@ class Member(models.Model):
                                                                      payment.payment_value)
             if payment.free_months:
                 months += payment.free_months
-        return start + delta_months(months)
+
+        result = start + delta_months(months)
+        cache.set("membershipexpiry-%d" % self.id, result)
+        return result
 
     def member_type(self):
         """
@@ -282,19 +290,33 @@ class MemberPayment(BaseIncome):
         return "Payment $%s %s from %s (%s)" % (self.payment_value, self.date,
                                                 self.member, self.membership_type)
 
+    def save(self):
+        cache.delete("membershipexpiry-%d" % self.member.id)
+        BaseIncome.save(self)
+
     class Meta:
         ordering = [ "-date" ] 
 
 class CostManager(models.Manager):
+
+    def cached_costs(self, membership_type):
+        """
+        Return a (cached, if possible) list of all membership costs for a particular membership type,
+        in chronological (first first) order
+        """
+        key = "membershipcosts-%d" % membership_type.id
+        result = cache.get(key)
+        if result is None:
+            result = self.filter(membership=membership_type).order_by("valid_from")
+            cache.set(key, result)
+        return result
+
     def applicable_cost(self, membership_type, date=date.today()):
         """
         Return the monthly cost applicable for a particular membership type, on a particular day
         """
-        costs = self.filter(membership=membership_type, valid_from__lte=date).order_by("-valid_from")
-        if costs.count() == 0:
-            return None
-        else:
-            return costs[0]
+        costs = [ x for x in self.cached_costs(membership_type) if x.valid_from <= date ]
+        return None if len(costs) == 0 else costs[-1]
 
     def applicable_duration(self, membership_type, date, payment):
         """
@@ -306,8 +328,8 @@ class CostManager(models.Manager):
         if starter is None:
             raise Error("Asked to get applicable cost for %s at %s - no rate for membership applied then!" % 
                         (membership_type, date))
-        changes = self.filter(membership=membership_type,
-                              valid_from__gt=date).order_by("valid_from") # rates applying thereafter
+
+        changes = [ x for x in self.cached_costs(membership_type) if x.valid_from > date ]
         changes = [starter] + list(changes)
         cost = float(starter.monthly_cost)
         total = 0.0
@@ -330,6 +352,10 @@ class MembershipCost(models.Model):
     monthly_cost = models.DecimalField(max_digits=10, decimal_places=2)
     valid_from = models.DateField()
     objects = CostManager()
+
+    def save(self):
+        cache.clear()
+        models.Model.save(self)
 
     class Meta:
         ordering = [ "valid_from" ]
