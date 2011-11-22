@@ -1,9 +1,8 @@
 {% extends "admin/base_site.html" %}
 
-{% block title %}Member Roster{% endblock %}
-
 {% block content %}
 
+{% if show_summary %}
 <p>
 {{count}} members of Make, Hack, Void.
 </p>
@@ -13,6 +12,8 @@
 {{count}} {{type}}</br>
 {% endfor %}
 </p>
+
+{% endif %}
 
 <table style="border-spacing: 8pt;">
   <tr>

@@ -15,11 +15,26 @@ def members(request):
     }[request.GET.get('sort', 'name')]
     members = sorted(members, key=sortby)
 
+    show_summary = True
+    title = "Member Roster"
     # count how many of each member type we have
     alltypes = [ m.member_type().membership_name for m in members if m.member_type() is not None ]
     counts = sorted([(a, alltypes.count(a)) for a in set(alltypes)], key=lambda x:x[0])
 
     count = len(members)
+    return render_to_response("members.html", locals())
+
+def expiring_soon(request):
+    """
+    Display members expiring soon, in order of soonness
+    """
+    members = Member.objects.all().order_by("last_name")
+    members = [ m for m in members if m.expiry_date() < date.today() + timedelta(days=30) ] # expired, or expiring soon
+    members = reversed(sorted(members, key=lambda m: m.expiry_date()) )
+    members = [ m for m in members if m.memberpayment_set.count() > 0 ] # hacky, this should be in DB layer
+
+    show_summary = False
+    title = "Expiring Members"
     return render_to_response("members.html", locals())
 
 
