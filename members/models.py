@@ -43,17 +43,20 @@ class Member(models.Model):
         """
         Return the expiry date for this member's full or associate membership
         """
-        payments = self.memberpayment_set.order_by("-date")
-        # walk backwards through payments until we find a start
+        payments = self.memberpayment_set.order_by("date")
+        # walk forwards through payments, tracking expiration
         months = 0
         start = self.join_date
         for payment in payments:
             if payment.duration() is None:
                 continue
-            months += payment.duration()
             if not payment.continues_membership: # beginning
                 start = payment.date
-                break
+                months = 0
+
+            months += MembershipCost.objects.applicable_duration(payment.membership_type,
+                                                                     start + delta_months(months),
+                                                                     payment.payment_value)
         return start + delta_months(months)
 
     def member_type(self):
@@ -299,7 +302,8 @@ class CostManager(models.Manager):
         payment=float(payment)
         starter = self.applicable_cost(membership_type, date) # rate applying at start
         if starter is None:
-            return None
+            raise Error("Asked to get applicable cost for %s at %s - no rate for membership applied then!" % 
+                        (membership_type, date))
         changes = self.filter(membership=membership_type,
                               valid_from__gt=date).order_by("valid_from") # rates applying thereafter
         changes = [starter] + list(changes)

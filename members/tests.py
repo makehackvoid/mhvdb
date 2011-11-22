@@ -57,7 +57,8 @@ class MembershipExpiryTest(TestCase):
         calculated based on the cost that applies at the time
         """
         payment = MemberPayment(membership_type=self.associate, payment_type=BANK_PAYMENT,
-                                member=self.fred, payment_value="480", date=date(2011,8,1)) # $40/mo * 12 months
+                                member=self.fred, payment_value="480", date=date(2011,8,1),
+                                continues_membership=False) # $40/mo * 12 months
         payment.save()
         payment = self.fred.memberpayment_set.all()[0]
         self.assertEqual(payment.duration(), 12)
@@ -69,7 +70,8 @@ class MembershipExpiryTest(TestCase):
         of their existing membership period
         """
         MemberPayment(membership_type=self.associate,payment_type=BANK_PAYMENT,
-                      member=self.fred, payment_value="120", date=date(2011,8,1)).save() # $40/mo * 3 months
+                      member=self.fred, payment_value="120", date=date(2011,8,1),
+                      continues_membership=False).save() # $40/mo * 3 months
         MemberPayment(membership_type=self.associate, payment_type=BANK_PAYMENT,
                       member=self.fred, payment_value="120", date=date(2011,10,1),
                       continues_membership=True).save() # 3 more months
@@ -81,7 +83,8 @@ class MembershipExpiryTest(TestCase):
         payment should be backdated
         """
         MemberPayment(membership_type=self.associate,payment_type=BANK_PAYMENT,
-                      member=self.fred, payment_value="120", date=date(2011,8,1)).save() # $40/mo * 3 months
+                      member=self.fred, payment_value="120", date=date(2011,8,1),
+                      continues_membership=False).save() # $40/mo * 3 months
         MemberPayment(membership_type=self.associate, payment_type=BANK_PAYMENT,
                       member=self.fred, payment_value="120", date=date(2011,12,1),
                       continues_membership=True).save() # 3 more months, LATE!
@@ -94,9 +97,11 @@ class MembershipExpiryTest(TestCase):
         count back to the old one
         """
         MemberPayment(membership_type=self.associate,payment_type=BANK_PAYMENT,
-                      member=self.fred, payment_value="120", date=date(2011,8,1)).save() # $40/mo * 3 months
+                      member=self.fred, payment_value="120", date=date(2011,8,1),
+                      continues_membership=False).save() # $40/mo * 3 months
         MemberPayment(membership_type=self.associate, payment_type=BANK_PAYMENT,
-                      member=self.fred, payment_value="120", date=date(2012,8,1)).save() # 3 months again
+                      member=self.fred, payment_value="120", date=date(2012,8,1),
+                      continues_membership=False).save() # 3 months again
         self.assertEqual(self.fred.expiry_date(), date(2012,10,31))
 
 
@@ -110,7 +115,8 @@ class MembershipExpiryTest(TestCase):
         # $200 buys 2 months on 1 May, but would buy 4 months on 1 June... so result
         # should be 3 months
         MemberPayment(membership_type=self.full,payment_type=BANK_PAYMENT,
-                      member=self.fred, payment_value="200", date=date(2011,5,1)).save()
+                      member=self.fred, payment_value="200", date=date(2011,5,1),
+                      continues_membership=False).save()
         self.assertEqual(self.fred.expiry_date(), date(2011,7,30))
 
     def test_no_pro_rate_over_rate_hike(self):
@@ -121,9 +127,39 @@ class MembershipExpiryTest(TestCase):
 
         # $120 buys 6 months on 1 May, and that's how it stays
         MemberPayment(membership_type=self.associate,payment_type=BANK_PAYMENT,
-                      member=self.fred, payment_value="120", date=date(2011,5,1)).save()
+                      member=self.fred, payment_value="120", date=date(2011,5,1),
+                      continues_membership=False).save()
         self.assertEqual(self.fred.expiry_date(), date(2011,10,30))
 
+
+    def test_pro_rata_applies_renewals_equally(self):
+        """
+        If someone renews late then their pro rata should apply the same
+        as someone who renews on time
+        """
+        jane = dummy_member("Jane Durst")
+        jane.save()
+
+        # $200 buys 2 months on 1 May, but would buy 4 months on 1 June...
+        # so expectation is:
+        # $200 on 1 March buys to 1 May
+        # $200 on 1 May is $100 to 1 June, then $100 more to 1 August
+        MemberPayment(membership_type=self.full,payment_type=BANK_PAYMENT,
+                      member=self.fred, payment_value="200", date=date(2011,3,1),
+                      continues_membership=False).save()
+        MemberPayment(membership_type=self.full,payment_type=BANK_PAYMENT,
+                      member=self.fred, payment_value="200", date=date(2011,4,20),
+                      continues_membership=True).save()
+
+        MemberPayment(membership_type=self.full,payment_type=BANK_PAYMENT,
+                      member=jane, payment_value="200", date=date(2011,3,1),
+                      continues_membership=False).save()
+        MemberPayment(membership_type=self.full,payment_type=BANK_PAYMENT,
+                      member=jane, payment_value="200", date=date(2011,5,10),
+                      continues_membership=True).save()
+
+        self.assertEqual(self.fred.expiry_date(), jane.expiry_date())
+        self.assertEqual(self.fred.expiry_date(), date(2011,7,29))
 
 
 class RecurringExpenseTest(TestCase):
