@@ -91,3 +91,12 @@ def default(request):
 
     last_modified = max(lastexpense.date, lastdonation.date, memberpayments.date)
     return render_to_response("index.html", locals())
+
+
+def emergency_contact(request, member_id):
+    """
+    Display emergency contact details
+    """
+    member = Member.objects.get(pk=member_id)
+    return render_to_response("emergency_contact.html", locals())
+

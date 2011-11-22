@@ -21,14 +21,16 @@
 	 <th><a href="members?sort=type">Membership Type</a></th>
 	 <th><a href="members?sort=expiry">Expires (Associate/Full)</a></th>
 	 <th><a href="members?sort=join">Join Date</a></th>
+	 <th></th>
   </tr>
   {% for member in members %}
   <tr>
 	 <td>{{member.fullname}}</td>
-	 <td><a href="{%url admin:members_member_change member.id%}">(edit)</a></td>
+	 <td><a href="{%url admin:members_member_change member.id %}">(edit)</a></td>
 	 <td>{{member.member_type}}</td>
 	 <td>{{member.expiry_date}}</td>
 	 <td>{{member.join_date}}</td>
+	 <td><a href="{%url members.views.emergency_contact member.id %}">Emergency Contact</a></td>
   </tr>
   {% endfor %}
 </table>

@@ -1,0 +1,21 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}Emergency Contact - {{member.fullname}}{% endblock %}
+
+{% block content %}
+
+<a href="{% url members.views.members %}">Back to Member Roster</a>
+
+<h1>Emergency Contact for {{member.fullname}}</h1>
+
+<p>
+<h2>Name</h2>
+<p>
+{{member.emergency_contact_name}}
+</p>
+<h2>Phone</h2>
+<p>
+{{member.emergency_contact_number}}
+</p>
+
+{% endblock %}

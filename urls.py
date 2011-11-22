@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     (r'^members$', 'members.views.members'),
     (r'^balance$', 'members.views.balance'),
     (r'^$',        'members.views.default'),
+    (r'^membercontact/(?P<member_id>\d+)/?$', 'members.views.emergency_contact'),
     (r'^report$',        'members.views.financial_report'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
