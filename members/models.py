@@ -25,14 +25,16 @@ def delta_months(months):
 
 
 class Member(models.Model):
-    last_name = models.CharField(max_length=50)
-    first_name = models.CharField(max_length=50)
-    join_date = models.DateField()
-    address = models.TextField()
-    username = models.CharField(max_length=20, blank=True)
-    emergency_contact_name = models.CharField(max_length=50)
-    emergency_contact_number = models.CharField(max_length=50)
-    medical_info = models.TextField(blank=True)
+    last_name = models.CharField(max_length=50, verbose_name="Last Name")
+    first_name = models.CharField(max_length=50, verbose_name="First Name")
+    join_date = models.DateField(verbose_name="Date Joined")
+    address = models.TextField(verbose_name="Address", help_text="A postal address where you can be reached")
+    username = models.CharField(max_length=20, blank=True, verbose_name="Website Username",
+                                help_text="Username on www.makehackvoid.com (if you have one.)")
+    emergency_contact_name = models.CharField(max_length=50, verbose_name="Emergency Contact Name")
+    emergency_contact_number = models.CharField(max_length=50, verbose_name="Emergency Contact Phone Number")
+    medical_info = models.TextField(blank=True, verbose_name="Medical Information",
+                                    help_text="Any medical information that's pertinent to your time in the space?")
 
     def __unicode__(self):
         return self.fullname()
@@ -85,8 +87,9 @@ class Member(models.Model):
 
 class Email(models.Model):
     member = models.ForeignKey(Member)
-    email = models.CharField(max_length=50)
-    is_preferred = models.BooleanField(default=True)
+    email = models.CharField(max_length=50, verbose_name="Email Address")
+    is_preferred = models.BooleanField(default=True, verbose_name="Preferred Address",
+                                       help_text="Is this the address you'd rather be contacted on?")
 
 class ExpenseManager(models.Manager):
 
@@ -362,6 +365,7 @@ class MembershipCost(models.Model):
 
 class Phone(models.Model):
     member = models.ForeignKey(Member)
-    phone_number = models.CharField(max_length=20)
-    description = models.TextField(blank=True)
+    phone_number = models.CharField(max_length=20, verbose_name="Phone Number")
+    description = models.CharField(blank=True, max_length=80, verbose_name="Phone Number Description",
+                                   help_text="Any description of this phone number?")
 

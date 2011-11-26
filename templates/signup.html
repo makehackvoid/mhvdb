@@ -1,0 +1,28 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}Signup{% endblock %}
+
+{% block content %}
+
+<h1>Member Signup</h1>
+
+<p>Fill in this form with your details to become a new member of Make, Hack, Void.
+
+<p><h2>Before submitting this form you must read and agree to the <a href="http://www.makehackvoid.com/community/rules">Make, Hack, Void Rules</a>.</h2></p>
+
+<p>If you are unsure what type of member you want to become, details can be found on the <a href="http://www.makehackvoid.com/community/membership">Membership page</a>.</p>
+
+<form action="{% url members.views.signup %}" method="post" autocomplete="off">{% csrf_token %}
+<table>
+{{form.as_table}}
+{{phone_formset.as_table}}
+{{email_formset.as_table}}
+</table>
+
+<p>By clicking submit you are asking to become a member of Make, Hack, Void, Inc. (pending payment.) You are also indicating that you have read, and agreed to abide by, the <a href="http://www.makehackvoid.com/community/rules">Rules</a>.</p>
+
+
+<input type="submit" value="Submit" />
+</form>
+
+{% endblock %}

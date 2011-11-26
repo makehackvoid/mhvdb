@@ -1,6 +1,11 @@
+from django.core.urlresolvers import reverse
 from django.shortcuts import *
 from members.models import *
 from datetime import date
+from forms import *
+from django.template import RequestContext
+from django.views.generic.simple import direct_to_template
+import logging
 
 def members(request):
     """
@@ -85,7 +90,7 @@ def financial_report(request):
     income_by_category["Membership Payments"] = sum(i.payment_value for i in MemberPayment.objects.filter(date__gte=date_from, date__lt=date_to))
 
     income_total = sum(i for i in ( l for l in income_by_category.values() ))
-    
+
     # expenses
     expense_items = list(Expense.objects.all_expenses_for_period(date_from, date_to))
     expense_by_category = {}
@@ -115,3 +120,20 @@ def emergency_contact(request, member_id):
     member = Member.objects.get(pk=member_id)
     return render_to_response("emergency_contact.html", locals())
 
+
+def signup(request):
+    """
+    Display/process a signup form
+    """
+    if request.method == 'POST':
+        form = MemberSignupForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse(signup_thankyou))
+    else:
+        form = MemberSignupForm()
+    return render_to_response('signup.html', locals(), context_instance=RequestContext(request))
+
+
+def signup_thankyou(request):
+    return direct_to_template(request, template = 'thanks.html')

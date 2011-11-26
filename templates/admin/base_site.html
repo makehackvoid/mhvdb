@@ -9,10 +9,11 @@
 
 {% block nav-global %}
 <a href="{%url members.views.default %}">Home</a> | 
+<a href="{%url members.views.signup %}">Member Signup</a> | 
 <a href="{%url admin:index %}">Admin</a> | 
 <a href="{%url members.views.members %}">Member Roster</a> | 
 <a href="{%url members.views.balance %}">Balance Sheet</a> | 
 <a href="{%url members.views.financial_report %}">Financial Report</a> | 
-<a href="{%url members.views.expiring_soon %}">Expiring Members</a><br/> 
+<a href="{%url members.views.expiring_soon %}">Expiring Members</a> | 
 {% endblock %}
 
