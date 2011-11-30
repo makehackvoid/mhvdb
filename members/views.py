@@ -5,12 +5,34 @@ from datetime import date
 from forms import *
 from django.template import RequestContext
 from django.views.generic.simple import direct_to_template
+from django.conf import settings
 import logging
+from ipaddr import IPNetwork, IPAddress
+
+logger = logging.getLogger(__name__)
+
+def is_local_or_authenticated(request):
+    """
+    Return True if the user is authenticated, or is on a 'local' network
+    as set under settings.LOCAL_IP_ADDRESSES
+    """
+    if request.user.is_authenticated():
+        return True
+    local_addrs = [ IPNetwork(addr) for addr in settings.LOCAL_IP_ADDRESSES ]
+    try:
+        remote = IPAddress(request.META["REMOTE_ADDR"])
+        return any( remote in a for a in local_addrs )
+    except:
+        return False
+
 
 def members(request):
     """
     Display the list of members
     """
+    if not is_local_or_authenticated(request):
+        return HttpResponseRedirect(settings.LOGIN_URL)
+
     members = Member.objects.all().order_by("last_name")
     sortby = { # is not possible to sort in the query as expiry/type are not DB fields
         'name'   : lambda m: ("%s %s" % (m.last_name, m.first_name)).lower(),
@@ -33,6 +55,9 @@ def expiring_soon(request):
     """
     Display members expiring soon, in order of soonness
     """
+    if not is_local_or_authenticated(request):
+        return HttpResponseRedirect(settings.LOGIN_URL)
+
     members = Member.objects.all().order_by("last_name")
     members = [ m for m in members if m.expiry_date() < date.today() + timedelta(days=30) ] # expired, or expiring soon
     members = reversed(sorted(members, key=lambda m: m.expiry_date()) )
@@ -54,6 +79,8 @@ def balance(request):
     """
     Display a balance sheet
     """
+    if not is_local_or_authenticated(request):
+        return HttpResponseRedirect(settings.LOGIN_URL)
 
     date_from = _parse_date(request.GET.get("from", ""), date(2010,12,1))
     date_to = _parse_date(request.GET.get("to", ""), date.today())
@@ -78,6 +105,8 @@ def financial_report(request):
     """
     Display something approximating an end of financial year report
     """
+    if not is_local_or_authenticated(request):
+        return HttpResponseRedirect(settings.LOGIN_URL)
 
     date_from = _parse_date(request.GET.get("from", ""), date(2010,7,1))
     date_to = _parse_date(request.GET.get("to", ""), date(2011,7,1))
@@ -117,6 +146,9 @@ def emergency_contact(request, member_id):
     """
     Display emergency contact details
     """
+    if not is_local_or_authenticated(request):
+        return HttpResponseRedirect(settings.LOGIN_URL)
+
     member = Member.objects.get(pk=member_id)
     return render_to_response("emergency_contact.html", locals())
 

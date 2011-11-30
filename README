@@ -16,6 +16,10 @@ Features
 
 * Provides easy summary page of soon-to-expire or just-expired memberships.
 
+* Allow a local IP range that can view some common data (membership
+  roster, expiries, members' emergency contact info) without logging in
+  (see LOCAL_IP_ADDRESSES in settings.py)
+
 * Over 50% Yak Hair Free
 
 Not Features

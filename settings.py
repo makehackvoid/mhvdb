@@ -115,4 +115,20 @@ INSTALLED_APPS = (
 # This is the membership type that expired or new members default over to
 DEFAULT_MEMBERSHIP_NAME = "Casual"
 
+# A list of IP networks (can be networks of form 192.168.1.1/24 or
+# single IPs, or even IPv6) that are considered "local". Local IP
+# Addresses can view the members list, expiry dates, and member
+# emergency contact details without being logged in.
+#
+# Editing content (ie the admin interface) still requires logging in,
+# as does viewing any member's details apart from emergency
+# contact. Also, the signup form is always available.
+#
+# The idea is that you add the local LAN network of your organisation,
+# so people can quickly view important details.
+#
+LOCAL_IP_ADDRESSES = [ "127.0.0.1" ]
+
+LOGIN_URL = "/login"
+
 local_settings.modify(globals())
