@@ -112,4 +112,7 @@ INSTALLED_APPS = (
     'django_evolution',
 )
 
+# This is the membership type that expired or new members default over to
+DEFAULT_MEMBERSHIP_NAME = "Casual"
+
 local_settings.modify(globals())

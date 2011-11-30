@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.cache import cache
+from django.conf import settings
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 import math
@@ -77,7 +78,7 @@ class Member(models.Model):
         """
         payments = self.memberpayment_set.order_by("-date")
         if len(payments) == 0 or self.expiry_date() < date.today():
-            return Membership.objects.get(membership_name="Casual")
+            return Membership.objects.get(membership_name=settings.DEFAULT_MEMBERSHIP_NAME)
         else:
             return payments[0].membership_type
 
