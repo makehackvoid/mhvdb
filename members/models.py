@@ -293,7 +293,8 @@ class MemberPayment(BaseIncome):
     # only set this for freebies, is calculated from payment_value otherwise
     free_months = models.IntegerField(default=0)
     continues_membership = models.BooleanField(default=True, help_text="Is this a renewal (ie continues from current expiry date?)")
-    is_existing_upgrade = models.BooleanField(default=False,help_text="Is this an existing member changing membership type (meaning pro rata of any remaining time on their old type)")
+    is_existing_upgrade = models.BooleanField(default=False, verbose_name="Existing Member Changing Type",
+                                              help_text="Is this an existing member changing membership type (meaning pro rata of any remaining time on their old type)")
 
     def duration(self):
         """ Calculate how many months of the given membership this buys

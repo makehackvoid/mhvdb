@@ -78,10 +78,24 @@ Getting Started
   # RecurringExpenses are for costs that repeat reliably over a period of time.
 
 
+FAQ
+===
+
+* How do I add a membership renewal?
+  # View the member's entry under Admin -> Members, and there is a list of Member Payments at the bottom.
+    Add a new one for the member, making sure the "Continues Membership" box is checked if this is a renewal.
+
+* What happens if a member upgrades/downgrades their membership type before it expires?
+  # Supported! Add a new Member Payment (it can be $0 if they're not paying anything at that time), with the
+    new membership type and check "Existing Member Changing Type". Their membership will be
+    recalculated as the new type, reusing any left over membership they had from the old type.
+
+
 Contributors
 ============
 
 Geoff Swan
 Angus Gratton
 
-... further contributors welcome. :)
+... further contributors very welcome. :)
+
