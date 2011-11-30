@@ -3,6 +3,14 @@
 # If you have settings that are specific to your local install (like DATABASES
 # or paths to templates, etc. then put them in a modify() method in
 # local_settings, as shown at http://stackoverflow.com/q/2086802
+#
+#
+# Things which MUST be in local_settings:
+#
+#def modify(settings):
+#        settings['SECRET_KEY'] = 'putrandomstringhere'
+#
+
 import local_settings
 
 DEBUG = True
@@ -63,9 +71,6 @@ MEDIA_URL = ''
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = '/media/'
-
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = '(j6yevu@cenp4bh324zv!bik4&$gh39qn$0sm9cj1qiq0$jj%b'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
