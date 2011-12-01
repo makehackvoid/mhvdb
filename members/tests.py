@@ -46,9 +46,9 @@ class MembershipExpiryTest(TestCase):
         """
         Test that the system knows what membership costs on various dates
         """
-        self.assertEqual( MembershipCost.objects.applicable_cost(self.associate, date(2011,2,1)).monthly_cost, 20 )
-        self.assertEqual( MembershipCost.objects.applicable_cost(self.associate, date(2011,7,1)).monthly_cost, 40 )
-        self.assertEqual( MembershipCost.objects.applicable_cost(self.full, date(2012,1,1)).monthly_cost, 50 )
+        self.assertEqual( MembershipCost.objects.applicable_rate(self.associate, date(2011,2,1)).monthly_cost, 20 )
+        self.assertEqual( MembershipCost.objects.applicable_rate(self.associate, date(2011,7,1)).monthly_cost, 40 )
+        self.assertEqual( MembershipCost.objects.applicable_rate(self.full, date(2012,1,1)).monthly_cost, 50 )
 
 
     def test_auto_duration(self):
@@ -173,6 +173,41 @@ class MembershipExpiryTest(TestCase):
                       member=self.fred, payment_value="0", date=date(2011,4,1), free_months=2,
                       continues_membership=True).save()
         self.assertEqual(self.fred.expiry_date(), date(2011,6,30))
+
+    def test_mid_term_upgrade(self):
+        """
+        It should be possible to up/downgrade membership type midstream
+        and have the expiry date change appropriately
+        """
+        # $240 buys 6 months associate (to Feb 2012)
+        MemberPayment(membership_type=self.associate,payment_type=BANK_PAYMENT,
+                      member=self.fred, payment_value="240", date=date(2011,8,1),
+                      continues_membership=False).save()
+
+        # After 1 month, we upgrade. The $200 left is 5 month associate or 4 month full
+        MemberPayment(membership_type=self.full, payment_type=BANK_PAYMENT,
+                      member=self.fred, payment_value="0", date=date(2011,9,1),
+                      is_existing_upgrade=True).save()
+        self.assertEqual(self.fred.member_type(date(2011,11,1)), self.full)
+        self.assertEqual(self.fred.expiry_date(), date(2011,12,30))
+
+    def test_mid_term_upgrade_with_payment(self):
+        """
+        It's also possible to up/downgrade membership midstream with a payment
+        at the same time
+        """
+        # $240 buys 6 months associate (to Feb 2012)
+        MemberPayment(membership_type=self.associate,payment_type=BANK_PAYMENT,
+                      member=self.fred, payment_value="240", date=date(2011,8,1),
+                      continues_membership=False).save()
+
+        # After 1 month, we upgrade. The $200 left is 5 month associate or 4 month full
+        # but we also a pay in $100 for 2 more months of full
+        MemberPayment(membership_type=self.full, payment_type=BANK_PAYMENT,
+                      member=self.fred, payment_value="100", date=date(2011,9,1),
+                      is_existing_upgrade=True).save()
+        self.assertEqual(self.fred.member_type(date(2011,2,1)), self.full)
+        self.assertEqual(self.fred.expiry_date(), date(2012,2,29))
 
 
 

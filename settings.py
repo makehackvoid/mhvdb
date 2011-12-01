@@ -3,6 +3,14 @@
 # If you have settings that are specific to your local install (like DATABASES
 # or paths to templates, etc. then put them in a modify() method in
 # local_settings, as shown at http://stackoverflow.com/q/2086802
+#
+#
+# Things which MUST be in local_settings:
+#
+#def modify(settings):
+#        settings['SECRET_KEY'] = 'putrandomstringhere'
+#
+
 import local_settings
 
 DEBUG = True
@@ -64,9 +72,6 @@ MEDIA_URL = ''
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = '/media/'
 
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = '(j6yevu@cenp4bh324zv!bik4&$gh39qn$0sm9cj1qiq0$jj%b'
-
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
@@ -104,6 +109,26 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+    'django_evolution',
 )
+
+# This is the membership type that expired or new members default over to
+DEFAULT_MEMBERSHIP_NAME = "Casual"
+
+# A list of IP networks (can be networks of form 192.168.1.1/24 or
+# single IPs, or even IPv6) that are considered "local". Local IP
+# Addresses can view the members list, expiry dates, and member
+# emergency contact details without being logged in.
+#
+# Editing content (ie the admin interface) still requires logging in,
+# as does viewing any member's details apart from emergency
+# contact. Also, the signup form is always available.
+#
+# The idea is that you add the local LAN network of your organisation,
+# so people can quickly view important details.
+#
+LOCAL_IP_ADDRESSES = [ "127.0.0.1" ]
+
+LOGIN_URL = "/login"
 
 local_settings.modify(globals())

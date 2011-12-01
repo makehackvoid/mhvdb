@@ -1,9 +1,13 @@
 from django.conf.urls.defaults import *
+from django.utils.functional import curry
+from django.views.defaults import server_error, page_not_found
 
-
-# Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
+
+# Error handlers
+handler500 = curry(server_error, template_name='admin/500.html')
+handler404 = curry(page_not_found, template_name='admin/404.html')
 
 urlpatterns = patterns('',
                        # Example:
@@ -22,4 +26,7 @@ urlpatterns = patterns('',
 
                        # Uncomment the next line to enable the admin:
                        (r'^admin/', include(admin.site.urls)),
+
+                       # reuse the admin login template
+                       url(r'^login$', 'django.contrib.auth.views.login', {'template_name': 'admin/login.html'}),
                        )

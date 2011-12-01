@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.cache import cache
+from django.conf import settings
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 import math
@@ -23,6 +24,8 @@ def delta_months(months):
     """ Make a datetime timedelta for this many months"""
     return timedelta(DAYS_PER_MONTH*months)
 
+def delta_to_months(delta):
+    return float(delta.days)/DAYS_PER_MONTH
 
 class Member(models.Model):
     last_name = models.CharField(max_length=50, verbose_name="Last Name")
@@ -54,16 +57,26 @@ class Member(models.Model):
         # walk forwards through payments, tracking expiration
         months = 0.0
         start = self.join_date
+        last_type = None
         for payment in payments:
             if payment.duration() is None:
                 continue
-            if not payment.continues_membership: # beginning
+            if payment.is_existing_upgrade: # membership type is changing with this one
+                # convert any outstanding months into months @ the new rate
+                old_expiry = start + delta_months(months)
+                remaining = old_expiry - payment.date # time remaining on the old rate, to be converted to new rate
+                old_rate = MembershipCost.objects.applicable_rate(last_type, payment.date).monthly_cost
+                new_rate = MembershipCost.objects.applicable_rate(payment.membership_type, payment.date).monthly_cost
+                months = delta_to_months(remaining) * float(old_rate)/ float(new_rate)  # adjust by ratio of old:new rates
+                start = payment.date
+            elif not payment.continues_membership: # beginning anew
                 start = payment.date
                 months = 0.0
 
             months += MembershipCost.objects.applicable_duration(payment.membership_type,
                                                                      start + delta_months(months),
                                                                      payment.payment_value)
+            last_type = payment.membership_type
             if payment.free_months:
                 months += payment.free_months
 
@@ -71,13 +84,13 @@ class Member(models.Model):
         cache.set("membershipexpiry-%d" % self.id, result)
         return result
 
-    def member_type(self):
+    def member_type(self, at_date=date.today()):
         """
         Return the current member type, or Casual if the membership has expired
         """
         payments = self.memberpayment_set.order_by("-date")
-        if len(payments) == 0 or self.expiry_date() < date.today():
-            return Membership.objects.get(membership_name="Casual")
+        if len(payments) == 0 or self.expiry_date() < at_date:
+            return Membership.objects.get(membership_name=settings.DEFAULT_MEMBERSHIP_NAME)
         else:
             return payments[0].membership_type
 
@@ -275,11 +288,13 @@ class MemberPayment(BaseIncome):
     """
     Any payment (or freebie) for an Associate or Full membership
     """
-    member = models.ForeignKey(Member) 
+    member = models.ForeignKey(Member)
     membership_type = models.ForeignKey(Membership)
     # only set this for freebies, is calculated from payment_value otherwise
     free_months = models.IntegerField(default=0)
-    continues_membership = models.BooleanField(default=True)
+    continues_membership = models.BooleanField(default=True, help_text="Is this a renewal (ie continues from current expiry date?)")
+    is_existing_upgrade = models.BooleanField(default=False, verbose_name="Existing Member Changing Type",
+                                              help_text="Is this an existing member changing membership type (meaning pro rata of any remaining time on their old type)")
 
     def duration(self):
         """ Calculate how many months of the given membership this buys
@@ -314,7 +329,7 @@ class CostManager(models.Manager):
             cache.set(key, result)
         return result
 
-    def applicable_cost(self, membership_type, date=date.today()):
+    def applicable_rate(self, membership_type, date=date.today()):
         """
         Return the monthly cost applicable for a particular membership type, on a particular day
         """
@@ -327,7 +342,7 @@ class CostManager(models.Manager):
         given a particular starting date and duration. Will pro rata across discounted rates.
         """
         payment=float(payment)
-        starter = self.applicable_cost(membership_type, date) # rate applying at start
+        starter = self.applicable_rate(membership_type, date) # rate applying at start
         if starter is None:
             raise Error("Asked to get applicable cost for %s at %s - no rate for membership applied then!" % 
                         (membership_type, date))
@@ -338,7 +353,7 @@ class CostManager(models.Manager):
         total = 0.0
         for fr,to in ( (changes[i],changes[i+1]) for i in range(0,len(changes)-1) ):
             period=to.valid_from-max(fr.valid_from, date)
-            period_months = float(period.days)/DAYS_PER_MONTH
+            period_months = delta_to_months(period)
             cost = min(float(fr.monthly_cost), cost)
             period_cost = period_months*cost
             if period_cost > payment:
