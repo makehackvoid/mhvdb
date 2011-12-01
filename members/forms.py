@@ -11,7 +11,7 @@ class MemberSignupForm(ModelForm):
         exclude = ( 'join_date' )
 
     phone_number = forms.CharField(max_length=12, label="Phone Number")
-    email_address = forms.CharField(max_length=14, label="Email Address")
+    email_address = forms.CharField(max_length=50, label="Email Address")
 
     def save(self):
         if self.instance.join_date is None:
