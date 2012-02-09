@@ -1,0 +1,7 @@
+Reminder of an upcoming member expiry:
+
+{{m.first_name}} {{m.last_name}} {{m.expiry_date}}
+
+Please check the bank account to make sure they haven't paid, or they
+will be wrongly told that their membership has expired!
+

@@ -1,0 +1,18 @@
+Hi {{m.first_name}},
+
+Your MHV membership expired today. :(
+
+If you believe this is wrong, or have already paid, please reply to
+this email and tell us to lift our game!
+
+You're still welcome to access the space as a Casual member, or come to Maker Meetup events.
+
+
+If you want to continue your membership, current membership rates and
+payment details can be found at:
+
+http://www.makehackvoid.com/community/membership#associate
+
+You can make a bank transfer with your membership dues (as many months
+as you like), and then reply to this email and let us know so we can
+enter the payment into our system.

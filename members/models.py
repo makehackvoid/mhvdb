@@ -3,7 +3,12 @@ from django.core.cache import cache
 from django.conf import settings
 from datetime import date, datetime, timedelta
 from decimal import Decimal
-import math
+from django.core.mail import send_mail
+from django.template.loader import get_template
+from django.template import Context
+import math, logging
+
+logger = logging.getLogger(__name__)
 
 class Error(Exception):
     """Base class for exceptions in this module."""
@@ -94,8 +99,37 @@ class Member(models.Model):
         else:
             return payments[0].membership_type
 
+
+    def send_email(self, template, send_to_member=True):
+        """
+        Send the member an email, using the specified template for content
+        """
+        text = get_template("email/%s"%template).render(Context({"m":self}))
+        subject = settings.EMAIL_SUBJECTS[template]
+        recipients = []
+        if send_to_member:
+            emails = list(self.email_set.all())
+            recipients = [ e.email for e in emails if e.is_preferred ]
+            if len(recipients) == 0:
+                recipients = [ e.email for e in emails ]
+        if template in settings.EMAIL_CC:
+            recipients += settings.EMAIL_CC[template]
+        logger.info("Emailing template %s to %s for member id %s" % (template, recipients, self.id))
+        if len(recipients) == 0:
+            logger.info("No recipients, so no email!")
+            return
+        if settings.IS_DEVELOPMENT:
+            logger.debug("Email not sent, body would be:\n%s" % text)
+        else:
+            send_mail(subject, text, settings.EMAIL_SENDER, recipients)
+
     class Meta:
         ordering = ["last_name", "first_name"]
+
+    def save(self):
+        if self.id:
+            cache.delete("membershipexpiry-%d" % self.id)
+        models.Model.save(self)
 
 
 class Email(models.Model):
@@ -309,11 +343,17 @@ class MemberPayment(BaseIncome):
                                                 self.member, self.membership_type)
 
     def save(self):
+        old_id = self.id
         cache.delete("membershipexpiry-%d" % self.member.id)
         BaseIncome.save(self)
+        if old_id is None and date.today() - self.date < timedelta(days=30): # new payment entered
+            if self.member.memberpayment_set.count() == 1:
+                self.member.send_email("welcome.txt")
+            else:
+                self.member.send_email("renewed.txt")
 
     class Meta:
-        ordering = [ "-date" ] 
+        ordering = [ "-date" ]
 
 class CostManager(models.Manager):
 

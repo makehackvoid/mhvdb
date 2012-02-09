@@ -11,7 +11,7 @@
 #        settings['SECRET_KEY'] = 'putrandomstringhere'
 #
 
-import local_settings
+import local_settings, logging
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -24,7 +24,7 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',        
+        'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'mhv.db',                      # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
@@ -131,4 +131,34 @@ LOCAL_IP_ADDRESSES = [ "127.0.0.1" ]
 
 LOGIN_URL = "/login"
 
+EMAIL_HOST = "localhost"
+EMAIL_PORT = 25
+
+EMAIL_SENDER = "treasurer@makehackvoid.com"
+
+EXPIRING_DAYS = 14 # warn the member when their membership expires this many days away
+EXPIRING_INTERNAL_DAYS = 3 # warn the treasurer when a member's membership expires this many days away
+
+EMAIL_SUBJECTS = {
+    "welcome.txt"  : "Welcome to Make, Hack, Void!",
+    "renewed.txt" : "Make, Hack, Void membership has renewed",
+    "expiring.txt" : "Make, Hack, Void membership expires soon",
+    "expired.txt"  : "Make, Hack, Void membership has expired",
+    "internal.txt" : "MHV membership is about to expire!"
+}
+
+EMAIL_CC = {
+    "expired.txt" : [ EMAIL_SENDER ],
+    "internal.txt" : [ EMAIL_SENDER ], # internal.txt is -only- sent to this address, not to the member
+}
+
+IS_DEVELOPMENT = False # override this to =True in local_settings.py for debug/dev servers
+
+# this amount of logging is really only useful for the debug server
+logging.basicConfig(
+    level = logging.DEBUG,
+    format = '%(asctime)s %(levelname)s %(message)s',
+)
+
 local_settings.modify(globals())
+
