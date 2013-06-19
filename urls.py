@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 from django.utils.functional import curry
 from django.views.defaults import server_error, page_not_found
 
@@ -12,6 +12,7 @@ handler404 = curry(page_not_found, template_name='admin/404.html')
 urlpatterns = patterns('',
                        # Example:
                        # (r'^mhvdb/', include('mhvdb.foo.urls')),
+                       # url(r'^$', 'mhvdb.views.home', name='home'),
                        (r'^members$', 'members.views.members'),
                        (r'^balance$', 'members.views.balance'),
                        (r'^$',        'members.views.default'),

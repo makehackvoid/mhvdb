@@ -27,11 +27,11 @@
   {% for member in members %}
   <tr>
 	 <td>{{member.fullname}}</td>
-	 <td><a href="{%url admin:members_member_change member.id %}">(edit)</a></td>
+	 <td><a href="{%url 'admin:members_member_change' member.id %}">(edit)</a></td>
 	 <td>{{member.member_type}}</td>
 	 <td>{{member.expiry_date}}</td>
 	 <td>{{member.join_date}}</td>
-	 <td><a href="{%url members.views.emergency_contact member.id %}">Emergency Contact</a></td>
+	 <td><a href="{%url 'members.views.emergency_contact' member.id %}">Emergency Contact</a></td>
   </tr>
   {% endfor %}
 </table>

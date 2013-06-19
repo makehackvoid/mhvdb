@@ -12,7 +12,7 @@
 
 <p>If you are unsure what type of member you want to become, details can be found on the <a href="http://www.makehackvoid.com/community/membership">Membership page</a>.</p>
 
-<form action="{% url members.views.signup %}" method="post" autocomplete="off">{% csrf_token %}
+<form action="{% url 'members.views.signup' %}" method="post" autocomplete="off">{% csrf_token %}
 <table>
 {{form.as_table}}
 {{phone_formset.as_table}}

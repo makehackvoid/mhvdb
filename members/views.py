@@ -4,7 +4,8 @@ from members.models import *
 from datetime import date
 from forms import *
 from django.template import RequestContext
-from django.views.generic.simple import direct_to_template
+# from django.views.generic.simple import direct_to_template
+from django.views.generic import TemplateView
 from django.conf import settings
 import logging
 from ipaddr import IPNetwork, IPAddress
@@ -166,6 +167,5 @@ def signup(request):
         form = MemberSignupForm()
     return render_to_response('signup.html', locals(), context_instance=RequestContext(request))
 
-
 def signup_thankyou(request):
-    return direct_to_template(request, template = 'thanks.html')
+    return TemplateView(request, template = 'thanks.html')
