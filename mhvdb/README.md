@@ -1,9 +1,7 @@
 mhvdb is a simple Django app for tracking the state of the [Make, Hack, Void](http://www.makehackvoid.com/)
-hackerspace membership. You might find it useful for your Hackerspace or similar organisation, but
-possibly only if it somewhat resembles MHV in structure.
+hackerspace membership. You might find it useful for your Hackerspace or similar organisation, but possibly only if it somewhat resembles MHV in structure.
 
-It is not very complex at all, it mostly leverages Django Admin Interface to do
-the heavy lifting.
+It is not very complex at all, it mostly leverages Django Admin Interface to do the heavy lifting.
 
 Features
 ========
@@ -21,8 +19,7 @@ Features
   (see LOCAL_IP_ADDRESSES in settings.py) This is so-far-unused and
   probably not secure.
 
-* Will email members when their membership is about to expire, and/or the Treasurer
-  once membership has expired.
+* Will email members when their membership is about to expire, and/or the Treasurer once membership has expired.
 
 * Over 50% Yak Hair Free
 
@@ -42,7 +39,7 @@ Not Features
 Requirements
 ============
 
-* Django 1.2 or newer.
+* Django 1.5 or newer.
 
 * [django-evolution](http://code.google.com/p/django-evolution/) (easy_install django-evolution) for schema management.
 
@@ -67,12 +64,8 @@ Getting Started
 
 * Create essential data about your organisation:
   + "Memberships" are types of membership offered (ie MHV has 'Associate' and 'Full' membership.)
-  + By default, mhvdb assumes you'll add a membership type called "Casual" for any new member, or member
-    whose membership expires. You can override the name of this type in overide_settings.py
-  + "Membership Costs" are associated with each membership, giving a per-month rate. Costs can change over
-    time, each cost has a "valid from" field which determines when it applies from. If a membership's costs go
-    down over time, mhvdb will automatically grant a pro rata extension of membership to current members
-    already paid (the converse does not apply, if membership costs go up there is no pro rata shortening!)
+  + By default, mhvdb assumes you'll add a membership type called "Casual" for any new member, or member whose membership expires. You can override the name of this type in overide_settings.py
+  + "Membership Costs" are associated with each membership, giving a per-month rate. Costs can change over time, each cost has a "valid from" field which determines when it applies from. If a membership's costs go down over time, mhvdb will automatically grant a pro rata extension of membership to current members already paid (the converse does not apply, if membership costs go up there is no pro rata shortening!)
 
 * Add specific data from your organisation:
   + "Member" is self-explanatory, basic personal data about members.

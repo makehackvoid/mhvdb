@@ -10,12 +10,27 @@
 #def modify(settings):
 #        settings['SECRET_KEY'] = 'putrandomstringhere'
 #
-
+#for local testing, the settings.py might look like this:
+#
+# def modify(settings):
+#     settings["DATABASES"] = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': '/path/to/mhv.db',
+#             }
+#         }
+#     settings["TEMPLATE_DIRS"] = ( "/path/to/mhvdb/mhvdb/templates/" )
+#     settings['SECRET_KEY'] = 'putrandomstringhere'
+#     settings['DEBUG'] = True
+#     settings['IS_DEVELOPMENT'] = True
+#
+#
+#
 # mhv imports
 import local_settings
 import logging
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -27,12 +42,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'mhv.db',   # Or path to database file if using sqlite3.
-        # The following settings are not used with sqlite3:
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',    # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '',    # Set to empty string for default.
+        'NAME': 'mhv.db',
     }
 }
 
@@ -48,7 +58,7 @@ CACHES = {
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = []
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -145,7 +155,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',  #mhv
-    # 'members',                  #mhv
+    'members',                  #mhv
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -170,7 +180,7 @@ DEFAULT_MEMBERSHIP_NAME = "Casual"  #mhv
 # The idea is that you add the local LAN network of your organisation,
 # so people can quickly view important details.
 #
-LOCAL_IP_ADDRESSES = [ "127.0.0.1" ]   #mhv
+LOCAL_IP_ADDRESSES = []   #mhv
 
 LOGIN_URL = "/login"  #mhv
 
