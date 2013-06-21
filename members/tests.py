@@ -1,8 +1,7 @@
 """
-This file demonstrates two different styles of tests (one doctest and one
-unittest). These will both pass when you run "manage.py test".
-
-Replace these with more appropriate tests for your application.
+Run "manage.py test members" to test the members app
+'./manage.py test members --traceback' gives a full traceback
+In django 1.5 running 'manage.py test' will try to run the django-evolution tests which fail
 """
 
 from django.test import TestCase
@@ -53,7 +52,7 @@ class MembershipExpiryTest(TestCase):
 
     def test_auto_duration(self):
         """
-        If a new MemberPayment gets inserted, its duration (if empty) should automatically be 
+        If a new MemberPayment gets inserted, its duration (if empty) should automatically be
         calculated based on the cost that applies at the time
         """
         payment = MemberPayment(membership_type=self.associate, payment_type=BANK_PAYMENT,
@@ -233,7 +232,7 @@ class RecurringExpenseTest(TestCase):
                                    period_unit="Year",
                                    period=1, category=self.doom)
 
-        self.assertPeriod(expense, date(2011,1,1), date(2011,10,1), 
+        self.assertPeriod(expense, date(2011,1,1), date(2011,10,1),
                           [ date(2011,1,1) ])
 
         self.assertPeriod(expense, date(1995,1,1), date(2014,2,1),
