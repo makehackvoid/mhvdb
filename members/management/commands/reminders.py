@@ -1,7 +1,9 @@
-import datetime, csv, sys
-from django.core.management.base import BaseCommand, CommandError
+from datetime import date
+
+from django.core.management.base import BaseCommand
+
 from members.models import *
-from datetime import date,datetime
+
 
 # Run this command once a day to send "expiring soon" and "just expired" warnings to members
 

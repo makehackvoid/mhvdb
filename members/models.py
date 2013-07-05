@@ -1,12 +1,14 @@
+from datetime import date, timedelta
+import logging
+
 from django.db import models
 from django.core.cache import cache
+
 from django.conf import settings
-from datetime import date, datetime, timedelta
-from decimal import Decimal
 from django.core.mail import send_mail
 from django.template.loader import get_template
 from django.template import Context
-import math, logging
+
 
 logger = logging.getLogger(__name__)
 

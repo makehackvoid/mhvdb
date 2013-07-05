@@ -4,9 +4,12 @@ Run "manage.py test members" to test the members app
 In django 1.5 running 'manage.py test' will try to run the django-evolution tests which fail
 """
 
-from django.test import TestCase
-from members.models import *
 from datetime import date
+
+from django.test import TestCase
+
+from members.models import *
+
 
 def dummy_member(name, join_date=date(2011,1,1)):
     """

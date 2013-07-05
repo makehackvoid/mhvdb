@@ -1,9 +1,12 @@
-import datetime, csv, sys
+import datetime
+import csv
 
-from django.core.management.base import BaseCommand, CommandError
+from datetime import date
+
+from django.core.management.base import BaseCommand
+
 from members.models import *
 
-from datetime import date,datetime
 EPOCH=date(2000,1,1)
 
 class Command(BaseCommand):

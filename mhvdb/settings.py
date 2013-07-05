@@ -27,8 +27,10 @@
 #
 #
 # mhv imports
-import local_settings
 import logging
+
+import local_settings
+
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG

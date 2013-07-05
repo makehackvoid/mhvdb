@@ -1,5 +1,7 @@
-from members.models import *
 from django.contrib import admin
+
+from members.models import *
+
 
 class PhoneInline(admin.StackedInline):
     model = Phone

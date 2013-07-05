@@ -1,6 +1,5 @@
 from django.forms import ModelForm
 import django.forms as forms
-from django.forms.models import inlineformset_factory
 from models import *
 
 class MemberSignupForm(ModelForm):
