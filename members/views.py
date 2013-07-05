@@ -9,6 +9,7 @@ from django.views.generic import TemplateView
 from django.conf import settings
 import logging
 from ipaddr import IPNetwork, IPAddress
+from datetime import date
 
 logger = logging.getLogger(__name__)
 
@@ -101,16 +102,22 @@ def balance(request):
 
     return render_to_response('balance.html', locals())
 
+def financial_reports(request):
+    years = range(2010, date.today().year+1);
+    return render_to_response('financial_reports.html', locals())
 
-def financial_report(request):
+def financial_report(request, year):
     """
     Display something approximating an end of financial year report
     """
+
+    year = int(year)
+
     if not is_local_or_authenticated(request):
         return HttpResponseRedirect(settings.LOGIN_URL)
 
-    date_from = _parse_date(request.GET.get("from", ""), date(2010,7,1))
-    date_to = _parse_date(request.GET.get("to", ""), date(2011,7,1))
+    date_from = min(date(year,7,1), datetime.now().date())
+    date_to = min(date(year+1,7,1), datetime.now().date())
 
     # income
     income_items = list(Income.objects.filter(date__gte=date_from, date__lt=date_to))
