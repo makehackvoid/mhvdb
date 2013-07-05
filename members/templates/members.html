@@ -9,7 +9,7 @@
 
 <p>
 {% for type,count in counts %}
-{{count}} {{type}}</br>
+{{count}} {{type}}<br>
 {% endfor %}
 </p>
 
@@ -17,11 +17,11 @@
 
 <table style="border-spacing: 8pt;">
   <tr>
-	 <th><a href="members?sort=name">Full Name</a></th>
+	 <th><a href="{% url 'members.views.members' %}?sort=name">Full Name</a></th>
 	 <th>Edit</th>
-	 <th><a href="members?sort=type">Membership Type</a></th>
-	 <th><a href="members?sort=expiry">Expires (Associate/Full)</a></th>
-	 <th><a href="members?sort=join">Join Date</a></th>
+	 <th><a href="{% url 'members.views.members' %}?sort=type">Membership Type</a></th>
+	 <th><a href="{% url 'members.views.members' %}?sort=expiry">Expires (Associate/Full)</a></th>
+	 <th><a href="{% url 'members.views.members' %}?sort=join">Join Date</a></th>
 	 <th></th>
   </tr>
   {% for member in members %}

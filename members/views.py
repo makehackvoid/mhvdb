@@ -1,4 +1,5 @@
 from datetime import date
+from datetime import datetime
 
 from django.core.urlresolvers import reverse
 from django.shortcuts import *
@@ -77,7 +78,7 @@ def _parse_date(string, default):
     """ should probably be using Django Forms for all this """
     try:
         return datetime.strptime(string, "%Y-%m-%d").date()
-    except ValueError as e:
+    except ValueError:
         return default
 
 def balance(request):

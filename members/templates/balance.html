@@ -1,20 +1,18 @@
 {% extends "admin/base_site.html" %}
 {% load humanize %}
-<!DOCTYPE html>
-<html>
 
 {% block title %} Balance Sheet {{date_from}} -> {{date_to}} {% endblock %}
 
 {% block extrahead %}
-  <link type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" media="all"></link>
+  <link type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" media="all">
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.min.js"></script>
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
   <script type="text/javascript">
 	 $(function(){
+       var picker = $(".picker");
+	   picker.datepicker({ dateFormat: 'yy-mm-dd' });
 
-	   $(".picker").datepicker({ dateFormat: 'yy-mm-dd' });
-
-	   $(".picker").change(function(){
+	   picker.change(function(){
 	     window.location.search = "from=" + $("#from").val() +
 	                          "&to=" + $("#to").val();
         });
@@ -30,49 +28,47 @@
 
 <h3>Change Period</h3>
 <p>
-From: <input class="picker" type="text" id="from" value="{{date_from|date:"Y-m-d"}}" />
-To: <input class="picker" type="text" id="to" value="{{date_to|date:"Y-m-d"}}" />
+    <label for="from">From:</label> <input class="picker" type="text" id="from" value="{{date_from|date:"Y-m-d"}}" />
+    <label for="to">To:</label> <input class="picker" type="text" id="to" value="{{date_to|date:"Y-m-d"}}" />
 </p>
 
 <h3>Summary</h3>
-  <p>
-	 <table style="border-spacing: 8pt;">
-		<tr>
-		  <td>{{date_from}}</td>
-		  <td>Starting Balance</td>
-		  <td>${{start_balance|intcomma}}</td>
-		</tr>
-		<tr>
-		  <td></td>
-		  <td>Period Income</td>
-		  <td>${{income|intcomma}}</td>
-		</tr>
-		<tr>
-		  <td></td>
-		  <td>Period Expense</td>
-		  <td>${{expense|intcomma}}</td>
-		</tr>
-		<tr>
-		  <td></td>
-		  <td>Period Balance</td>
-		  <td>${{period_balance|intcomma}}</td>
-		</tr>
-		<tr>
-		  <td>{{date_to}}</td>
-		  <td>End Balance</td>
-		  <td>${{end_balance|intcomma}}</td
-		</tr>
+ <table style="border-spacing: 8pt;">
+    <tr>
+      <td>{{date_from}}</td>
+      <td>Starting Balance</td>
+      <td>${{start_balance|intcomma}}</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Period Income</td>
+      <td>${{income|intcomma}}</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Period Expense</td>
+      <td>${{expense|intcomma}}</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Period Balance</td>
+      <td>${{period_balance|intcomma}}</td>
+    </tr>
+    <tr>
+      <td>{{date_to}}</td>
+      <td>End Balance</td>
+      <td>${{end_balance|intcomma}}</td>
+    </tr>
 
-	 </table>
-  </p>
+ </table>
 
 <h3>Transactions</h3>
   <table style="border-spacing: 8pt;">
 	 <tr>
-		<th><a href="balance">Date</a></th>
-		<th><a href="balance">Amount</a></th>
-		<th><a href="balance">Description</a></th>
-		<th><a href="balance">Paid Via</a></th>
+		<th><a href="{% url 'members.views.balance' %}">Date</a></th>
+		<th><a href="{% url 'members.views.balance' %}">Amount</a></th>
+		<th><a href="{% url 'members.views.balance' %}">Description</a></th>
+		<th><a href="{% url 'members.views.balance' %}">Paid Via</a></th>
 	 </tr>
 	 {% for item in items %}
 	 <tr>

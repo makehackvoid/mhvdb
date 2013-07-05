@@ -11,7 +11,7 @@ from django.test import TestCase
 from members.models import *
 
 
-def dummy_member(name, join_date=date(2011,1,1)):
+def dummy_member(name):
     """
     Utility function to make a dummy member
     """
