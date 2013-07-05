@@ -7,11 +7,13 @@
 {{count}} members of Make, Hack, Void.
 </p>
 
-<p>
+<table>
 {% for type,count in counts %}
-{{count}} {{type}}<br>
+<tr><td class="align-right">{{count}}</td> <td>{{type}}</td></tr>
 {% endfor %}
-</p>
+</table>
+
+<br>
 
 {% endif %}
 

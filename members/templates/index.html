@@ -6,16 +6,14 @@
 MHVDB
 </h1>
 
-<p>
-<a href="{%url 'members.views.signup' %}">New Member Signups</a><br/>
-</p>
-<p>
-<a href="{%url 'admin:index' %}">Admin Interface</a> (for adding data)<br/>
-<a href="{%url 'members.views.balance' %}">Balance Sheet View</a><br/>
-<a href="{%url 'members.views.members' %}">Member Summary</a><br/>
-<a href="{%url 'members.views.financial_report' %}">Financial Report</a><br/>
-<a href="{%url 'members.views.expiring_soon' %}">Expiring Members</a><br/>
-</p>
+<ul>
+<li><a href="{%url 'members.views.signup' %}">New Member Signups</a><br></li>
+<li><a href="{%url 'admin:index' %}">Admin Interface</a> (for adding data)<br></li>
+<li><a href="{%url 'members.views.balance' %}">Balance Sheet View</a><br></li>
+<li><a href="{%url 'members.views.members' %}">Member Summary</a><br></li>
+<li><a href="{%url 'members.views.financial_report' %}">Financial Report</a><br></li>
+<li><a href="{%url 'members.views.expiring_soon' %}">Expiring Members</a></li>
+</ul>
 
 <p>Last piece of financial information (payments, expenses) is dated {{last_modified}}</p>
 
