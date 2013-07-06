@@ -96,8 +96,10 @@ FAQ
 Contributors
 ============
 
-Angus Gratton
-Geoff Swan
+- Angus Gratton
+- Brenda Moon
+- Cameron Moon
+- Geoff Swan
 
 ... further contributors very welcome. :)
 
