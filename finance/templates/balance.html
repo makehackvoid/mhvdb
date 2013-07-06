@@ -1,4 +1,4 @@
-{% extends "_base.html" %}
+{% extends "../../core/templates/_base.html" %}
 {% load humanize %}
 
 {% block title %}Balance Sheet{% endblock %}
@@ -75,10 +75,10 @@
 <h3>Transactions</h3>
   <table class='table table-striped table-hover'>
 	 <tr>
-		<th class='span2'><a href="{% url 'members.views.balance' %}">Date</a></th>
-		<th class='span1 text-right'><a href="{% url 'members.views.balance' %}">Amount</a></th>
-		<th class='span6'><a href="{% url 'members.views.balance' %}">Description</a></th>
-		<th class='span2'><a href="{% url 'members.views.balance' %}">Paid Via</a></th>
+		<th class='span2'><a href="{% url 'finance.views.balance' %}">Date</a></th>
+		<th class='span1 text-right'><a href="{% url 'finance.views.balance' %}">Amount</a></th>
+		<th class='span6'><a href="{% url 'finance.views.balance' %}">Description</a></th>
+		<th class='span2'><a href="{% url 'finance.views.balance' %}">Paid Via</a></th>
 	 </tr>
 	 {% for item in items %}
 	 <tr class='{% if item in expenses %}error{% elif item in memberpayments%}info{% else %}success{% endif %}'>

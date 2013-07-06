@@ -6,19 +6,19 @@ from django.contrib import admin
 admin.autodiscover()
 
 # Error handlers
-handler500 = curry(server_error, template_name='admin/500.html')
-handler404 = curry(page_not_found, template_name='admin/404.html')
+handler500 = curry(server_error, template_name='../templates/admin/500.html')
+handler404 = curry(page_not_found, template_name='../templates/admin/404.html')
 
 urlpatterns = patterns('',
                        # Example:
                        # (r'^mhvdb/', include('mhvdb.foo.urls')),
                        # url(r'^$', 'mhvdb.views.home', name='home'),
                        (r'^members$', 'members.views.members'),
-                       (r'^balance$', 'members.views.balance'),
-                       (r'^$',        'members.views.default'),
+                       (r'^balance$', 'finance.views.balance'),
+                       (r'^$',        'core.views.home'),
                        (r'^membercontact/(?P<member_id>\d+)/?$', 'members.views.emergency_contact'),
-                       (r'^reports/?$',        'members.views.financial_reports'),
-                       (r'^reports/(?P<year>\d+)/?$',        'members.views.financial_report'),
+                       (r'^reports/?$',        'finance.views.financial_reports'),
+                       (r'^reports/(?P<year>\d+)/?$',        'finance.views.financial_report'),
                        (r'^expiring$',        'members.views.expiring_soon'),
                        (r'^signup$',        'members.views.signup'),
                        (r'^thanks$',      'members.views.signup_thankyou'),
@@ -30,5 +30,5 @@ urlpatterns = patterns('',
                        (r'^admin/', include(admin.site.urls)),
 
                        # reuse the admin login template
-                       url(r'^login$', 'django.contrib.auth.views.login', {'template_name': 'admin/login.html'}),
+                       url(r'^login$', 'django.contrib.auth.views.login', {'template_name': '../templates/admin/login.html'}),
                        )

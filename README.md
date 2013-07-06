@@ -41,7 +41,7 @@ Requirements
 
 * Django 1.5 (pip install Django)
 
-* [django-evolution](http://code.google.com/p/django-evolution/) (easy_install django-evolution) for schema management.
+* [south](http://south.aeracode.org/) (pip install south) for schema management.
 
 * [django-bootstrap-toolkit](https://github.com/dyve/django-bootstrap-toolkit) (pip install django-bootstrap-toolkit)
 

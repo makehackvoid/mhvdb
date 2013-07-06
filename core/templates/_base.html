@@ -44,9 +44,9 @@
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
-            <a class="brand" href="/">MHV Mission Control</a>
+            <a class="brand" href="{% url 'core.views.home' %}">MHV Mission Control</a>
             <ul class="nav">
-                <li{% if navitem == 'home' %} class='active'{% endif %}><a href="{% url 'members.views.default' %}"><i class='icon-home icon-large'></i> Home</a></li>
+                <li{% if navitem == 'home' %} class='active'{% endif %}><a href="{% url 'core.views.home' %}"><i class='icon-home icon-large'></i> Home</a></li>
                 <li class="dropdown{% if navitem == 'members' %} active{% endif %}">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class='icon-user icon-large'></i> Members <i class="icon-caret-down"></i></a>
                     <ul class="dropdown-menu">
@@ -58,8 +58,8 @@
                 <li class="dropdown{% if navitem == 'finance' %} active{% endif %}">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class='icon-money icon-large'></i> Finances <i class="icon-caret-down"></i></a>
                     <ul class="dropdown-menu">
-                        <li><a href="{%url 'members.views.balance' %}"><i class='icon-book'></i> Balance Sheet</a></li>
-                        <li><a href="{%url 'members.views.financial_reports' %}"><i class='icon-file-text'></i> Financial Reports</a></li>
+                        <li><a href="{%url 'finance.views.balance' %}"><i class='icon-book'></i> Balance Sheet</a></li>
+                        <li><a href="{%url 'finance.views.financial_reports' %}"><i class='icon-file-text'></i> Financial Reports</a></li>
                     </ul>
                 </li>
                 <li{% if navitem == 'admin' %} class='active'{% endif %}><a href="{%url 'admin:index' %}"><i class='icon-cogs icon-large'></i> Admin</a></li>

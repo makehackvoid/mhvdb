@@ -1,4 +1,4 @@
-{% extends "_base.html" %}
+{% extends "../../core/templates/_base.html" %}
 
 {% block title %}Financial Reports{% endblock %}
 {% block heading %}Financial Reports{% endblock %}
@@ -8,7 +8,7 @@
 <h2>Choose a financial year:</h2>
 <ul>
 {% for year in years %}
-<li><a href="{% url 'members.views.financial_report' year=year %}">{{ year }} - {{ year|add:"1" }}</a></li>
+<li><a href="{% url 'finance.views.financial_report' year=year %}">{{ year }} - {{ year|add:"1" }}</a></li>
 {% endfor %}
 </ul>
 {% endblock %}

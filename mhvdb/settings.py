@@ -156,14 +156,16 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.humanize',  #mhv
-    'members',                  #mhv
+    'django.contrib.humanize',
+    'core',     # mhv
+    'members',  # mhv
+    'finance',  # mhv
     # Uncomment the next 2 lines to enable the admin:
     'django_admin_bootstrapped',
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-    'django_evolution',
+    'south',
     'bootstrap_toolkit'
 )
 
