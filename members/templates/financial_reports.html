@@ -1,10 +1,11 @@
-{% extends "admin/base_site.html" %}
+{% extends "_base.html" %}
 
 {% block title %}Financial Reports{% endblock %}
+{% block heading %}Financial Reports{% endblock %}
 
 {% block content %}
 
-<h1>Choose a financial year:</h1>
+<h2>Choose a financial year:</h2>
 <ul>
 {% for year in years %}
 <li><a href="{% url 'members.views.financial_report' year=year %}">{{ year }} - {{ year|add:"1" }}</a></li>

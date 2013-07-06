@@ -39,9 +39,13 @@ Not Features
 Requirements
 ============
 
-* Django 1.5 or newer.
+* Django 1.5 (pip install Django)
 
 * [django-evolution](http://code.google.com/p/django-evolution/) (easy_install django-evolution) for schema management.
+
+* [django-bootstrap-toolkit](https://github.com/dyve/django-bootstrap-toolkit) (pip install django-bootstrap-toolkit)
+
+* [django-admin-bootstrapped](https://github.com/riccardo-forina/django-admin-bootstrapped) (pip install django-admin-bootstrapped)
 
 Configuration
 =============

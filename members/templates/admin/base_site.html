@@ -1,19 +1,50 @@
 {% extends "admin/base.html" %}
 {% load i18n %}
 
-{% block title %}MHV Member Admin{% endblock %}
+{% block extrahead %}
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet' type='text/css'>
+    <style>
+    body {
+        font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    .container-fluid {
+        width: 940px;
+        margin: 0 auto;
+    }
+
+    .navbar-fixed-top .brand {
+        font-family: 'Orbitron', sans-serif;
+        margin-top: 3px;
+    }
+    </style>
+{% endblock %}
+
+{% block title %}Admin - MHV Mission Control{% endblock %}
 
 {% block branding %}
-<h1 id="site-name">{% trans 'MHV Administration' %}</h1>
+<a class="brand" href="/">MHV Mission Control</a>
+<ul class="nav">
+    <li><a href="{% url 'members.views.default' %}"><i class='icon-home icon-large'></i> Home</a></li>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class='icon-user icon-large'></i> Members <i class="icon-caret-down"></i></a>
+        <ul class="dropdown-menu">
+           <li><a href="{%url 'members.views.signup' %}"><i class='icon-plus-sign'></i> Member Signup</a></li>
+           <li><a href="{%url 'members.views.members' %}"><i class='icon-group'></i> Member List</a></li>
+           <li><a href="{%url 'members.views.expiring_soon' %}"><i class='icon-time'></i> Expiring Members</a></li>
+        </ul>
+    </li>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class='icon-money icon-large'></i> Finances <i class="icon-caret-down"></i></a>
+        <ul class="dropdown-menu">
+            <li><a href="{%url 'members.views.balance' %}"><i class='icon-book'></i> Balance Sheet</a></li>
+            <li><a href="{%url 'members.views.financial_reports' %}"><i class='icon-file-text'></i> Financial Reports</a></li>
+        </ul>
+    </li>
+    <li class='active'><a href="{%url 'admin:index' %}"><i class='icon-cogs icon-large'></i> Admin</a></li>
+</ul>
 {% endblock %}
 
-{% block nav-global %}
- <a href="{%url 'members.views.default' %}">Home</a> |
- <a href="{%url 'members.views.signup' %}">Member Signup</a> |
- <a href="{%url 'admin:index' %}">Admin</a> |
- <a href="{%url 'members.views.members' %}">Member Roster</a> |
- <a href="{%url 'members.views.balance' %}">Balance Sheet</a> |
- <a href="{%url 'members.views.financial_reports' %}">Financial Reports</a> |
- <a href="{%url 'members.views.expiring_soon' %}">Expiring Members</a> |
-{% endblock %}
+{% block logs %}{% endblock %}
 

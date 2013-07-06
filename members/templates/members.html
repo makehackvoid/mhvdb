@@ -1,4 +1,19 @@
-{% extends "admin/base_site.html" %}
+{% extends "_base.html" %}
+
+{% block title %}Members{% endblock %}
+{% block heading %}Member List{% endblock %}
+
+{% block extrahead %}
+    <style>
+        td i:hover {
+            text-decoration: none;
+        }
+
+        td.text-right {
+            text-align: right;
+        }
+    </style>
+{% endblock %}
 
 {% block content %}
 
@@ -7,9 +22,9 @@
 {{count}} members of Make, Hack, Void.
 </p>
 
-<table>
+<table class='table table-condensed' style='width: auto'>
 {% for type,count in counts %}
-<tr><td class="align-right">{{count}}</td> <td>{{type}}</td></tr>
+<tr><td class="text-right">{{count}}</td> <td>{{type}}</td></tr>
 {% endfor %}
 </table>
 
@@ -17,23 +32,23 @@
 
 {% endif %}
 
-<table style="border-spacing: 8pt;">
+<table class='table table-striped table-hover'>
   <tr>
 	 <th><a href="{% url 'members.views.members' %}?sort=name">Full Name</a></th>
-	 <th>Edit</th>
 	 <th><a href="{% url 'members.views.members' %}?sort=type">Membership Type</a></th>
 	 <th><a href="{% url 'members.views.members' %}?sort=expiry">Expires (Associate/Full)</a></th>
 	 <th><a href="{% url 'members.views.members' %}?sort=join">Join Date</a></th>
 	 <th></th>
+  	 <th></th>
   </tr>
   {% for member in members %}
   <tr>
 	 <td>{{member.fullname}}</td>
-	 <td><a href="{%url 'admin:members_member_change' member.id %}">(edit)</a></td>
 	 <td>{{member.member_type}}</td>
 	 <td>{{member.expiry_date}}</td>
 	 <td>{{member.join_date}}</td>
 	 <td><a href="{%url 'members.views.emergency_contact' member.id %}">Emergency Contact</a></td>
+	 <td><a href="{%url 'admin:members_member_change' member.id %}"><i class='icon-pencil icon-large'></i></a></td>
   </tr>
   {% endfor %}
 </table>

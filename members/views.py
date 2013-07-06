@@ -37,6 +37,7 @@ def members(request):
     """
     Display the list of members
     """
+    navitem = 'members'
     if not is_local_or_authenticated(request):
         return HttpResponseRedirect(settings.LOGIN_URL)
 
@@ -50,7 +51,6 @@ def members(request):
     members = sorted(members, key=sortby)
 
     show_summary = True
-    title = "Member Roster"
     # count how many of each member type we have
     alltypes = [ m.member_type().membership_name for m in members if m.member_type() is not None ]
     counts = sorted([(a, alltypes.count(a)) for a in set(alltypes)], key=lambda x:x[0])
@@ -62,6 +62,7 @@ def expiring_soon(request):
     """
     Display members expiring soon, in order of soonness
     """
+    navitem = 'members'
     if not is_local_or_authenticated(request):
         return HttpResponseRedirect(settings.LOGIN_URL)
 
@@ -86,6 +87,7 @@ def balance(request):
     """
     Display a balance sheet
     """
+    navitem = 'finance'
     if not is_local_or_authenticated(request):
         return HttpResponseRedirect(settings.LOGIN_URL)
 
@@ -108,6 +110,7 @@ def balance(request):
     return render_to_response('balance.html', locals())
 
 def financial_reports(request):
+    navitem = 'finance'
     years = range(2010, date.today().year+1);
     return render_to_response('financial_reports.html', locals())
 
@@ -115,7 +118,6 @@ def financial_report(request, year):
     """
     Display something approximating an end of financial year report
     """
-
     year = int(year)
 
     if not is_local_or_authenticated(request):
@@ -146,7 +148,7 @@ def default(request):
     """
     Display a summary default page
     """
-
+    navitem = 'home'
     lastexpense = Expense.objects.order_by("-date")[0]
     lastdonation = Income.objects.order_by("-date")[0]
     memberpayments = MemberPayment.objects.order_by("-date")[0]
@@ -159,6 +161,7 @@ def emergency_contact(request, member_id):
     """
     Display emergency contact details
     """
+    navitem = 'members'
     if not is_local_or_authenticated(request):
         return HttpResponseRedirect(settings.LOGIN_URL)
 
@@ -170,6 +173,7 @@ def signup(request):
     """
     Display/process a signup form
     """
+    navitem = 'members'
     if request.method == 'POST':
         form = MemberSignupForm(request.POST)
         if form.is_valid():
@@ -180,4 +184,4 @@ def signup(request):
     return render_to_response('signup.html', locals(), context_instance=RequestContext(request))
 
 def signup_thankyou(request):
-    return TemplateView(request, template = 'thanks.html')
+    return render_to_response("thanks.html", locals())
