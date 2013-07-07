@@ -1,7 +1,7 @@
 mhvdb is a simple Django app for tracking the state of the [Make, Hack, Void](http://www.makehackvoid.com/)
-hackerspace membership. You might find it useful for your Hackerspace or similar organisation, but possibly only if it somewhat resembles MHV in structure.
+hackerspace membership & finances. You might find it useful for your Hackerspace or similar organisation, but possibly only if it somewhat resembles MHV in structure.
 
-It is not very complex at all, it mostly leverages Django Admin Interface to do the heavy lifting.
+It is not very complex, and leverages Django admin interface to do most of the heavy lifting.
 
 Features
 ========
@@ -26,7 +26,7 @@ Features
 Not Features
 ============
 
-"Things that it would be nice for mhvdb to do, but it doesn't quite do yet"
+> Things that it would be nice for mhvdb to do, but it doesn't quite do yet
 
 * Full dual entry accounting for income & expenses, or at least better
   management of cash payments & especially cash deposits.
@@ -38,14 +38,13 @@ Not Features
 
 Requirements
 ============
+To install all required python packages, run `pip install -r requirements.txt`
 
-* Django 1.5 (pip install Django)
+* [Django 1.5](https://www.djangoproject.com/)
 
-* [south](http://south.aeracode.org/) (pip install south) for schema management.
+* [South](http://south.aeracode.org/) - For schema management.
 
-* [django-bootstrap-toolkit](https://github.com/dyve/django-bootstrap-toolkit) (pip install django-bootstrap-toolkit)
-
-* [django-admin-bootstrapped](https://github.com/riccardo-forina/django-admin-bootstrapped) (pip install django-admin-bootstrapped)
+* [django-bootstrap-toolkit](https://github.com/dyve/django-bootstrap-toolkit) & [django-admin-bootstrapped](https://github.com/riccardo-forina/django-admin-bootstrapped) - For django + bootstrap integration
 
 Configuration
 =============

@@ -19,7 +19,6 @@
 #             'NAME': '/path/to/mhv.db',
 #             }
 #         }
-#     settings["TEMPLATE_DIRS"] = ( "/path/to/mhvdb/mhvdb/templates/" )
 #     settings['SECRET_KEY'] = 'putrandomstringhere'
 #     settings['DEBUG'] = True
 #     settings['IS_DEVELOPMENT'] = True

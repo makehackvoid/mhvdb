@@ -1,0 +1,4 @@
+Django==1.5.1
+South==0.8.1
+django-admin-bootstrapped==0.4.1
+django-bootstrap-toolkit==2.14.0
