@@ -7,6 +7,10 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
+    depends_on = (
+        ('members', '0003_update_membership_structure'),
+    )
+
     def forwards(self, orm):
         # Adding model 'ExpiringProduct'
         db.create_table(u'finance_expiringproduct', (
@@ -38,6 +42,7 @@ class Migration(SchemaMigration):
 
         db.create_table(u'finance_membershipproduct', (
             (u'expiringproduct_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['finance.ExpiringProduct'], unique=True, primary_key=True)),
+            ('membership', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['members.Membership'])),
         ))
         db.send_create_signal(u'finance', ['MembershipProduct'])
 

@@ -7,10 +7,6 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
-    depends_on = (
-        ('finance', '0002_update_membership_structure'),
-    )
-
     def forwards(self, orm):
         db.rename_table(u'members_membershipcost', u'members_legacymembershipcost')
         db.rename_table(u'members_membership', u'members_legacymembership')
