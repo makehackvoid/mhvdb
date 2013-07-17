@@ -201,12 +201,45 @@ class Income(BaseIncome):
     def __unicode__(self):
         return "%s $%s (%s %s)" % (self.date, self.payment_value, self.category.name, self.description)
 
+
+class Product(models.Model):
+    name = models.CharField(max_length=32)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __unicode__(self):
+            return self.name
+
+
+class ExpiringProduct(Product):
+    duration = models.PositiveIntegerField()
+    duration_type = models.CharField(max_length=32,
+                                     choices=[
+                                     ("day", "Days"),
+                                     ("week", "Weeks"),
+                                     ("month", "Months"),
+                                     ("year", "Years"),
+                                     ])
+
+
+class MembershipProduct(ExpiringProduct):
+    membership = models.ForeignKey(Membership)
+
+
 class MemberPayment(BaseIncome):
+    member = models.ForeignKey(Member)
+    product = models.ForeignKey(Product)
+
+    def __unicode__(self):
+        return "Payment $%s %s from %s (%s)" % (self.payment_value, self.date,
+                                                self.member, self.product)
+
+
+class LegacyMemberPayment(BaseIncome):
     """
     Any payment (or freebie) for an Associate or Full membership
     """
     member = models.ForeignKey(Member)
-    membership_type = models.ForeignKey(Membership)
+    membership_type = models.ForeignKey(LegacyMembership)
     # only set this for freebies, is calculated from payment_value otherwise
     free_months = models.IntegerField(default=0)
     continues_membership = models.BooleanField(default=True, help_text="Is this a renewal (ie continues from current expiry date?)")
@@ -217,7 +250,7 @@ class MemberPayment(BaseIncome):
         """ Calculate how many months of the given membership this buys
             (can be fractional)
         """
-        return MembershipCost.objects.applicable_duration(self.membership_type,
+        return LegacyMembershipCost.objects.applicable_duration(self.membership_type,
                                                           self.date,
                                                           self.payment_value)
 

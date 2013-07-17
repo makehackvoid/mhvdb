@@ -171,7 +171,7 @@ INSTALLED_APPS = (
 ### MHV config below here
 
 # This is the membership type that expired or new members default over to
-DEFAULT_MEMBERSHIP_NAME = "Casual"  #mhv
+DEFAULT_MEMBERSHIP_NAME = "Expired"  #mhv
 
 # A list of IP networks (can be networks of form 192.168.1.1/24 or
 # single IPs, or even IPv6) that are considered "local". Local IP

@@ -42,18 +42,18 @@ class MembershipExpiryTest(TestCase):
         self.full.save()
 
         # Dummy membership cost structure - associate went up 1 June 2011, full came down(!)
-        MembershipCost(membership=self.associate, monthly_cost="20", valid_from=date(2011, 1, 1)).save()
-        MembershipCost(membership=self.associate, monthly_cost="40", valid_from=date(2011, 6, 1)).save()
-        MembershipCost(membership=self.full, monthly_cost="100", valid_from=date(2011, 1, 1)).save()
-        MembershipCost(membership=self.full, monthly_cost="50", valid_from=date(2011, 6, 1)).save()
+        LegacyMembershipCost(membership=self.associate, monthly_cost="20", valid_from=date(2011, 1, 1)).save()
+        LegacyMembershipCost(membership=self.associate, monthly_cost="40", valid_from=date(2011, 6, 1)).save()
+        LegacyMembershipCost(membership=self.full, monthly_cost="100", valid_from=date(2011, 1, 1)).save()
+        LegacyMembershipCost(membership=self.full, monthly_cost="50", valid_from=date(2011, 6, 1)).save()
 
     def test_durations(self):
         """
         Test that the system knows what membership costs on various dates
         """
-        self.assertEqual(MembershipCost.objects.applicable_rate(self.associate, date(2011, 2, 1)).monthly_cost, 20)
-        self.assertEqual(MembershipCost.objects.applicable_rate(self.associate, date(2011, 7, 1)).monthly_cost, 40)
-        self.assertEqual(MembershipCost.objects.applicable_rate(self.full, date(2012, 1, 1)).monthly_cost, 50)
+        self.assertEqual(LegacyMembershipCost.objects.applicable_rate(self.associate, date(2011, 2, 1)).monthly_cost, 20)
+        self.assertEqual(LegacyMembershipCost.objects.applicable_rate(self.associate, date(2011, 7, 1)).monthly_cost, 40)
+        self.assertEqual(LegacyMembershipCost.objects.applicable_rate(self.full, date(2012, 1, 1)).monthly_cost, 50)
 
     def test_auto_duration(self):
         """

@@ -25,11 +25,22 @@ PAYMENT_TYPE = [
     ('B', 'Electronic Transfer'),
     ('G', 'Gratis')
 ]
+DAYS_PER_YEAR  = 365.2425
+DAYS_PER_MONTH = DAYS_PER_YEAR/12
+DAYS_PER_WEEK  = 7
+DAYS_PER_DAY   = 1
 
-DAYS_PER_MONTH=365.25/12
-def delta_months(months):
-    """ Make a datetime timedelta for this many months"""
-    return timedelta(DAYS_PER_MONTH*months)
+def delta(duration, duration_type):
+    days = None
+    if duration_type == 'day':
+        days = duration*DAYS_PER_DAY
+    elif duration_type == 'week':
+        days = duration*DAYS_PER_WEEK
+    elif duration_type == 'month':
+        days = duration*DAYS_PER_MONTH
+    elif duration_type == 'year':
+        days = duration*DAYS_PER_YEAR
+    return timedelta(days)
 
 def delta_to_months(delta):
     return float(delta.days)/DAYS_PER_MONTH
@@ -60,7 +71,8 @@ class Member(models.Model):
         if cached is not None:
             return cached
 
-        payments = self.memberpayment_set.order_by("date")
+        # START old method
+        payments = self.legacymemberpayment_set.order_by("date")
         # walk forwards through payments, tracking expiration
         months = 0.0
         start = self.join_date
@@ -70,24 +82,37 @@ class Member(models.Model):
                 continue
             if payment.is_existing_upgrade: # membership type is changing with this one
                 # convert any outstanding months into months @ the new rate
-                old_expiry = start + delta_months(months)
+                old_expiry = start + delta(months, 'month')
                 remaining = old_expiry - payment.date # time remaining on the old rate, to be converted to new rate
-                old_rate = MembershipCost.objects.applicable_rate(last_type, payment.date).monthly_cost
-                new_rate = MembershipCost.objects.applicable_rate(payment.membership_type, payment.date).monthly_cost
+                old_rate = LegacyMembershipCost.objects.applicable_rate(last_type, payment.date).monthly_cost
+                new_rate = LegacyMembershipCost.objects.applicable_rate(payment.membership_type, payment.date).monthly_cost
                 months = delta_to_months(remaining) * float(old_rate)/ float(new_rate)  # adjust by ratio of old:new rates
                 start = payment.date
             elif not payment.continues_membership: # beginning anew
                 start = payment.date
                 months = 0.0
 
-            months += MembershipCost.objects.applicable_duration(payment.membership_type,
-                                                                     start + delta_months(months),
+            months += LegacyMembershipCost.objects.applicable_duration(payment.membership_type,
+                                                                     start + delta(months, 'month'),
                                                                      payment.payment_value)
             last_type = payment.membership_type
             if payment.free_months:
                 months += payment.free_months
 
-        result = start + delta_months(months)
+        result1 = start + delta(months, 'month') if months != 0 else None
+
+        # START new method
+        result2 = None
+        membership_payments = self.memberpayment_set.filter(product__name__icontains="Membership").order_by('-date')
+        if membership_payments:
+            last_membership_payment = membership_payments[0]
+            product = last_membership_payment.product.expiringproduct.membershipproduct
+            result2 = last_membership_payment.date + delta(product.duration, product.duration_type)
+
+        if result1 is None and result2 is not None: result = result2
+        elif result2 is None and result1 is not None: result = result1
+        else: result = max(result1, result2)
+
         cache.set("membershipexpiry-%d" % self.id, result)
         return result
 
@@ -95,12 +120,22 @@ class Member(models.Model):
         """
         Return the current member type, or Casual if the membership has expired
         """
-        payments = self.memberpayment_set.order_by("-date")
-        if len(payments) == 0 or self.expiry_date() < at_date:
+        legacy_payments = self.legacymemberpayment_set.order_by("-date")
+        membership_payments = self.memberpayment_set.filter(product__name__icontains="Membership").order_by('-date')
+        last_legacy_payment = legacy_payments[0] if legacy_payments else None
+        last_payment = membership_payments[0] if membership_payments else None
+        expiry = self.expiry_date()
+        type = Membership.objects.get(membership_name=settings.DEFAULT_MEMBERSHIP_NAME)
+        if expiry is None or expiry < at_date:
             return Membership.objects.get(membership_name=settings.DEFAULT_MEMBERSHIP_NAME)
-        else:
-            return payments[0].membership_type
+        elif last_legacy_payment and last_payment:
+            type = last_payment.product.expiringproduct.membershipproduct.membership if last_payment.date >= last_legacy_payment.date else last_legacy_payment.membership_type
+        elif last_legacy_payment:
+            type = last_legacy_payment.membership_type
+        elif last_payment:
+            type = last_payment.product.expiringproduct.membershipproduct.membership
 
+        return type
 
     def send_email(self, template, send_to_member=True):
         """
@@ -125,6 +160,9 @@ class Member(models.Model):
         else:
             send_mail(subject, text, settings.EMAIL_SENDER, recipients)
 
+    def is_legacy(self):
+        return type(self.member_type()) is LegacyMembership
+
     class Meta:
         ordering = ["last_name", "first_name"]
 
@@ -140,6 +178,15 @@ class Email(models.Model):
     is_preferred = models.BooleanField(default=True, verbose_name="Preferred Address",
                                        help_text="Is this the address you'd rather be contacted on?")
 
+
+class LegacyMembership(models.Model):
+    membership_name = models.CharField(max_length=30)
+    membership_description = models.TextField(blank=True)
+
+    def __unicode__(self):
+        return self.membership_name + " (Legacy)"
+
+
 class Membership(models.Model):
     membership_name = models.CharField(max_length=30)
     membership_description = models.TextField(blank=True)
@@ -147,7 +194,8 @@ class Membership(models.Model):
     def __unicode__(self):
         return self.membership_name
 
-class CostManager(models.Manager):
+
+class LegacyCostManager(models.Manager):
 
     def cached_costs(self, membership_type):
         """
@@ -197,11 +245,12 @@ class CostManager(models.Manager):
         # at end of list, so remainder is charged out at whatever rate applies at end
         return total + payment/min(cost, float(changes[-1].monthly_cost))
 
-class MembershipCost(models.Model):
-    membership = models.ForeignKey(Membership)
+
+class LegacyMembershipCost(models.Model):
+    membership = models.ForeignKey(LegacyMembership)
     monthly_cost = models.DecimalField(max_digits=10, decimal_places=2)
     valid_from = models.DateField()
-    objects = CostManager()
+    objects = LegacyCostManager()
 
     def save(self):
         cache.clear()
@@ -209,6 +258,7 @@ class MembershipCost(models.Model):
 
     class Meta:
         ordering = [ "valid_from" ]
+
 
 class Phone(models.Model):
     member = models.ForeignKey(Member)

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from members.models import *
-from finance.models import MemberPayment
+from finance.models import LegacyMemberPayment
 
 
 class PhoneInline(admin.StackedInline):
@@ -13,7 +13,7 @@ class EmailInline(admin.StackedInline):
     extra = 1
 
 class PaymentInline(admin.TabularInline):
-    model=MemberPayment
+    model=LegacyMemberPayment
     extra=0
 
 class MemberAdmin(admin.ModelAdmin):
@@ -27,9 +27,11 @@ class MemberAdmin(admin.ModelAdmin):
 admin.site.register(Member, MemberAdmin)
 
 class MembershipCostInline(admin.TabularInline):
-    model = MembershipCost
+    model = LegacyMembershipCost
     extra = 1
 
 class MembershipAdmin(admin.ModelAdmin):
     inlines = [ MembershipCostInline ]
-admin.site.register(Membership, MembershipAdmin)
+admin.site.register(LegacyMembership, MembershipAdmin)
+
+admin.site.register(Membership)
