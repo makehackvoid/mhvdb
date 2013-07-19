@@ -1,23 +1,15 @@
 Hi {{m.first_name}},
 
-Welcome to MHV! Your new membership payment has just been entered into our
-system. If you paid some time ago then our apologies - the system is
-new and our staff are all volunteers.
+Welcome to MHV! Your new annual membership payment has just been entered into our system. If you paid some time ago then our apologies - our staff are all volunteers.
 
-Your membership type is listed in our system as
-"{{m.member_type}}". Your membership will expire {{m.expiry_date}}.
+Your membership type is listed in our system as "{{m.member_type}}". Your membership will expire {{m.expiry_date}}.
 
-We'll send you a reminder email when your membership expiry is two
-weeks away. You can renew at any time.
+We'll send you a reminder email when your membership expiry is two weeks away. You can renew at any time.
 
-If anything in this email seems incorrect, please reply and let us
-know.
+If anything in this email seems incorrect, please reply and let us know.
 
-If you'd like to know when the space will be open, check the calendar
-on the web site: http://www.makehackvoid.com/
+If you'd like to know when the space will be open, check the google calendar on the web site: http://www.makehackvoid.com/
 
-and also make sure to join the "Announcements" mailing list:
-http://www.makehackvoid.com/community/mailing-lists
-
+and also make sure to join the "Announcements" mailing list: http://www.makehackvoid.com/community/mailing-lists
 
 Hope to see you in the space soon. Happy hacking!
