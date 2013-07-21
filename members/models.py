@@ -137,10 +137,10 @@ class Member(models.Model):
 
     def member_type(self, at_date=date.today()):
         """
-        Return the current member type, or Casual if the membership has expired
+        Return the current member type, or Expired if the membership has expired
         """
         legacy_payments = self.legacymemberpayment_set.order_by("-date")
-        membership_payments = self.memberpayment_set.filter(product__name__icontains="Membership").order_by('-date')
+        membership_payments = self.expiringmemberpayment_set.filter(product__name__icontains="Membership").order_by('-date')
         last_legacy_payment = legacy_payments[0] if legacy_payments else None
         last_payment = membership_payments[0] if membership_payments else None
         expiry = self.membership_expiry_date()
