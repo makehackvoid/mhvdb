@@ -22,5 +22,6 @@ admin.site.register(MemberPayment)
 admin.site.register(Product)
 admin.site.register(ExpiringProduct)
 admin.site.register(MembershipProduct)
+admin.site.register(ExpiringMemberPayment)
 
 

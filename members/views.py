@@ -42,7 +42,7 @@ def members(request):
     members = Member.objects.all().order_by("last_name")
     sortby = { # is not possible to sort in the query as expiry/type are not DB fields
         'name'   : lambda m: ("%s %s" % (m.last_name, m.first_name)).lower(),
-        'expiry' : lambda m: m.expiry_date(),
+        'expiry' : lambda m: m.membership_expiry_date(),
         'join'   : lambda m: m.join_date,
         'type'   : lambda m: m.member_type().membership_name
     }[request.GET.get('sort', 'name')]
@@ -65,8 +65,8 @@ def expiring_soon(request):
         return HttpResponseRedirect(settings.LOGIN_URL)
 
     members = Member.objects.all().order_by("last_name")
-    members = [ m for m in members if m.expiry_date() is not None and m.expiry_date() < date.today() + timedelta(days=30) and m.expiry_date() > date.today() - timedelta(days=30)] # expired, or expiring soon
-    members = reversed(sorted(members, key=lambda m: m.expiry_date()) )
+    members = [ m for m in members if m.membership_expiry_date() is not None and m.membership_expiry_date() < date.today() + timedelta(days=30) and m.membership_expiry_date() > date.today() - timedelta(days=30)] # expired, or expiring soon
+    members = reversed(sorted(members, key=lambda m: m.membership_expiry_date()) )
 
     show_summary = False
     title = "Expiring Members"

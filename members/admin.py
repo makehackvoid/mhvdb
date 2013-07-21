@@ -21,7 +21,7 @@ class MemberAdmin(admin.ModelAdmin):
 #        (None,               {'fields': ['question']}),
 #        ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
 #    ]
-    list_display = ('fullname', 'join_date', 'member_type', 'expiry_date' )
+    list_display = ('fullname', 'join_date', 'member_type', 'membership_expiry_date', 'access_expiry_date', 'key_expiry_date' )
     inlines = [PhoneInline, EmailInline, PaymentInline ]
 
 admin.site.register(Member, MemberAdmin)

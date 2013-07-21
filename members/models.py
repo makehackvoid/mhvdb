@@ -16,9 +16,9 @@ class Error(Exception):
     """Base class for exceptions in this module."""
     pass
 
-CASH_PAYMENT='C'
-BANK_PAYMENT='B'
-GRATIS='G'
+CASH_PAYMENT = 'C'
+BANK_PAYMENT = 'B'
+GRATIS       = 'G'
 
 PAYMENT_TYPE = [
     ('C', 'Cash Transfer'),
@@ -45,6 +45,20 @@ def delta(duration, duration_type):
 def delta_to_months(delta):
     return float(delta.days)/DAYS_PER_MONTH
 
+def expiry_date(payments):
+    if len(payments) == 0:
+        return None
+
+    expiry = payments[0].date
+    for payment in payments:
+        if not payment.continues_previous:
+            expiry = payment.date
+
+        expiry += delta(payment.product.duration * (float(payment.payment_value) / float(payment.product.price)), payment.product.duration_type)
+
+    return expiry
+
+
 class Member(models.Model):
     last_name = models.CharField(max_length=50, verbose_name="Last Name")
     first_name = models.CharField(max_length=50, verbose_name="First Name")
@@ -63,7 +77,7 @@ class Member(models.Model):
     def fullname(self):
         return "%s, %s" % (self.last_name, self.first_name)
 
-    def expiry_date(self):
+    def membership_expiry_date(self):
         """
         Return the expiry date for this member's full or associate membership
         """
@@ -80,15 +94,15 @@ class Member(models.Model):
         for payment in payments:
             if payment.duration() is None:
                 continue
-            if payment.is_existing_upgrade: # membership type is changing with this one
+            if payment.is_existing_upgrade:  # membership type is changing with this one
                 # convert any outstanding months into months @ the new rate
                 old_expiry = start + delta(months, 'month')
-                remaining = old_expiry - payment.date # time remaining on the old rate, to be converted to new rate
+                remaining = old_expiry - payment.date  # time remaining on the old rate, to be converted to new rate
                 old_rate = LegacyMembershipCost.objects.applicable_rate(last_type, payment.date).monthly_cost
                 new_rate = LegacyMembershipCost.objects.applicable_rate(payment.membership_type, payment.date).monthly_cost
                 months = delta_to_months(remaining) * float(old_rate)/ float(new_rate)  # adjust by ratio of old:new rates
                 start = payment.date
-            elif not payment.continues_membership: # beginning anew
+            elif not payment.continues_membership:  # beginning anew
                 start = payment.date
                 months = 0.0
 
@@ -102,12 +116,9 @@ class Member(models.Model):
         result1 = start + delta(months, 'month') if months != 0 else None
 
         # START new method
-        result2 = None
-        membership_payments = self.memberpayment_set.filter(product__name__icontains="Membership").order_by('-date')
-        if membership_payments:
-            last_membership_payment = membership_payments[0]
-            product = last_membership_payment.product.expiringproduct.membershipproduct
-            result2 = last_membership_payment.date + delta(product.duration, product.duration_type)
+
+        membership_payments = self.expiringmemberpayment_set.filter(product__name__icontains="Membership").order_by('-date')
+        result2 = expiry_date(membership_payments)
 
         if result1 is None and result2 is not None: result = result2
         elif result2 is None and result1 is not None: result = result1
@@ -115,6 +126,14 @@ class Member(models.Model):
 
         cache.set("membershipexpiry-%d" % self.id, result)
         return result
+
+    def access_expiry_date(self):
+        payments = self.expiringmemberpayment_set.filter(product__name__icontains="Access").order_by('date')
+        return expiry_date(payments)
+
+    def key_expiry_date(self):
+        payments = self.expiringmemberpayment_set.filter(product__name__icontains="Key").order_by('date')
+        return expiry_date(payments)
 
     def member_type(self, at_date=date.today()):
         """
@@ -124,7 +143,7 @@ class Member(models.Model):
         membership_payments = self.memberpayment_set.filter(product__name__icontains="Membership").order_by('-date')
         last_legacy_payment = legacy_payments[0] if legacy_payments else None
         last_payment = membership_payments[0] if membership_payments else None
-        expiry = self.expiry_date()
+        expiry = self.membership_expiry_date()
         type = Membership.objects.get(membership_name=settings.DEFAULT_MEMBERSHIP_NAME)
         if expiry is None or expiry < at_date:
             return Membership.objects.get(membership_name=settings.DEFAULT_MEMBERSHIP_NAME)

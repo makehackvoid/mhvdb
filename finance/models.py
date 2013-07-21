@@ -233,6 +233,14 @@ class MemberPayment(BaseIncome):
         return "Payment $%s %s from %s (%s)" % (self.payment_value, self.date,
                                                 self.member, self.product)
 
+class ExpiringMemberPayment(BaseIncome):
+    member = models.ForeignKey(Member)
+    product = models.ForeignKey(ExpiringProduct)
+    continues_previous = models.BooleanField()
+
+    def __unicode__(self):
+        return "Payment $%s %s from %s (%s)" % (self.payment_value, self.date,
+                                                self.member, self.product)
 
 class LegacyMemberPayment(BaseIncome):
     """
