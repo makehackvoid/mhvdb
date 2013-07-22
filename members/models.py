@@ -163,7 +163,7 @@ class Member(models.Model):
         legacy_payments = self.legacymemberpayment_set.order_by("-date")
         if legacy_payments:
             for payment in legacy_payments:
-                if payment.membership_type == 'Full (Legacy)' or payment.membership_type == 'Concession Full (Legacy)':
+                if 'Full' in payment.membership_type.membership_name:
                     return True
         return False
 
