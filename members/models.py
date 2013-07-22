@@ -156,6 +156,18 @@ class Member(models.Model):
 
         return type
 
+    def was_full_member(self):
+        """
+        Return true if per has every been legacy full member
+        """
+        legacy_payments = self.legacymemberpayment_set.order_by("-date")
+        last_legacy_payment = legacy_payments[0] if legacy_payments else None
+        if last_legacy_payment:
+            for payment in legacy_payments:
+                if 'Full' in payment.membership_type:
+                    return True
+        return False
+
     def send_email(self, template, send_to_member=True):
         """
         Send the member an email, using the specified template for content

@@ -4,7 +4,7 @@
 {% block title %}Home{% endblock %}
 {% block heading %}Welcome to <span class='brand'>MHV Mission Control</span>{% endblock %}
 {% block content %}
-<p>TODO: Something more useful here</p>
+<p>Mission control tracks memberships and finances for Make Hack Void</p>
 
 <ul>
 <li><a href="{%url 'members.views.signup' %}">New Member Signups</a><br></li>
@@ -13,6 +13,7 @@
 <li><a href="{%url 'members.views.members' %}">Member Summary</a><br></li>
 <li><a href="{%url 'finance.views.financial_reports' %}">Financial Report</a><br></li>
 <li><a href="{%url 'members.views.expiring_soon' %}">Expiring Members</a></li>
+<li><a href="{%url 'members.views.previous_full_member' %}">Previous Full Members</a></li>
 </ul>
 
 <p>Last piece of financial information (payments, expenses) is dated {{last_modified}}</p>

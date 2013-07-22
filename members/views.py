@@ -65,13 +65,28 @@ def expiring_soon(request):
         return HttpResponseRedirect(settings.LOGIN_URL)
 
     members = Member.objects.all().order_by("last_name")
-    members = [ m for m in members if m.membership_expiry_date() is not None and m.membership_expiry_date() < date.today() + timedelta(days=30) and m.membership_expiry_date() > date.today() - timedelta(days=30)] # expired, or expiring soon
+    members = [ m for m in members if m.membership_expiry_date() is not None and m.membership_expiry_date() < date.today() + timedelta(days=30) and m.membership_expiry_date() > date.today() - timedelta(days=60)] # expired, or expiring soon
     members = reversed(sorted(members, key=lambda m: m.membership_expiry_date()) )
 
     show_summary = False
     title = "Expiring Members"
     return render_to_response("members.html", locals())
 
+def previous_full_member(request):
+    """
+    Display everyone who has been full member (looking for keys)
+    """
+    navitem = 'members'
+    if not is_local_or_authenticated(request):
+        return HttpResponseRedirect(settings.LOGIN_URL)
+
+    members = Member.objects.all().order_by("last_name")
+    members = [m for m in members if m.was_full_member()]
+    members = reversed(sorted(members, key=lambda m: m.membership_expiry_date()) )
+
+    show_summary = False
+    title = "Previous Full Members"
+    return render_to_response("members.html", locals())
 
 def _parse_date(string, default):
     """ should probably be using Django Forms for all this """
