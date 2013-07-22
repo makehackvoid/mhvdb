@@ -161,10 +161,9 @@ class Member(models.Model):
         Return true if per has every been legacy full member
         """
         legacy_payments = self.legacymemberpayment_set.order_by("-date")
-        last_legacy_payment = legacy_payments[0] if legacy_payments else None
-        if last_legacy_payment:
+        if legacy_payments:
             for payment in legacy_payments:
-                if 'Full' in payment.membership_type:
+                if payment.membership_type == 'Full (Legacy)' or payment.membership_type == 'Concession Full (Legacy)':
                     return True
         return False
 

@@ -20,6 +20,7 @@ urlpatterns = patterns('',
                        (r'^reports/?$',        'finance.views.financial_reports'),
                        (r'^reports/(?P<year>\d+)/?$',        'finance.views.financial_report'),
                        (r'^expiring$',        'members.views.expiring_soon'),
+                       (r'^hadkey$',        'members.views.previous_full_member'),
                        (r'^signup$',        'members.views.signup'),
                        (r'^thanks$',      'members.views.signup_thankyou'),
 
