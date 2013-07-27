@@ -46,7 +46,9 @@ def members(request):
         'join'   : lambda m: m.join_date,
         'type'   : lambda m: m.member_type().membership_name
     }[request.GET.get('sort', 'name')]
+    members = filter(lambda x: x.member_type().membership_name != settings.DEFAULT_MEMBERSHIP_NAME, members)
     members = sorted(members, key=sortby)
+
 
     show_summary = True
     # count how many of each member type we have
@@ -56,7 +58,7 @@ def members(request):
     count = len(members)
     return render_to_response("members.html", locals())
 
-def expiring_soon(request):
+def expiring(request):
     """
     Display members expiring soon, in order of soonness
     """
@@ -70,6 +72,22 @@ def expiring_soon(request):
 
     show_summary = False
     title = "Expiring Members"
+    return render_to_response("members.html", locals())
+
+def expired(request):
+    """
+    Display expired members, in order of soonness
+    """
+    navitem = 'members'
+    if not is_local_or_authenticated(request):
+        return HttpResponseRedirect(settings.LOGIN_URL)
+
+    members = Member.objects.all().order_by("last_name")
+    members = [ m for m in members if m.membership_expiry_date() is not None and m.membership_expiry_date() < date.today()]
+    members = reversed(sorted(members, key=lambda m: m.membership_expiry_date()) )
+
+    show_summary = False
+    title = "Expired Members"
     return render_to_response("members.html", locals())
 
 def previous_full_member(request):

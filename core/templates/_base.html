@@ -66,7 +66,8 @@
                     <ul class="dropdown-menu">
                        <li><a href="{%url 'members.views.signup' %}"><i class='icon-plus-sign icon-fixed-width'></i> Member Signup</a></li>
                        <li><a href="{%url 'members.views.members' %}"><i class='icon-group icon-fixed-width'></i> Member List</a></li>
-                       <li><a href="{%url 'members.views.expiring_soon' %}"><i class='icon-time icon-fixed-width'></i> Expiring Members</a></li>
+                       <li><a href="{%url 'members.views.expiring' %}"><i class='icon-time icon-fixed-width'></i> Expiring Members</a></li>
+                       <li><a href="{%url 'members.views.expired' %}"><i class='icon-remove-circle icon-fixed-width'></i> Expired Members</a></li>
                     </ul>
                 </li>
                 <li class="dropdown{% if navitem == 'finance' %} active{% endif %}">

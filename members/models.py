@@ -75,7 +75,7 @@ class Member(models.Model):
         return self.fullname()
 
     def fullname(self):
-        return "%s, %s" % (self.last_name, self.first_name)
+        return "%s %s" % (self.first_name, self.last_name)
 
     def membership_expiry_date(self):
         """
