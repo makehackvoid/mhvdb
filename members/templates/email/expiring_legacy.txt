@@ -1,0 +1,11 @@
+Hi {{m.first_name}},
+
+This is a quick automated email to let you know that your old-style MHV membership is due to expire {{m.expiry_date}}.
+
+If you believe this is wrong, or have already paid, please reply to this email and so we can update the database.
+
+Otherwise, if you want to continue your membership, the new membership and access rates and payment details can be found at:
+
+http://www.makehackvoid.com/community/membership
+
+You can make a bank transfer with your annual membership fee and any access payments you want to make, and then reply to this email and let us know so we can enter the payment into our system.

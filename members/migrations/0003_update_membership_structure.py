@@ -1,20 +1,29 @@
 # -*- coding: utf-8 -*-
+import datetime
+from south.db import db
 from south.v2 import SchemaMigration
+from django.db import models
 
 
 class Migration(SchemaMigration):
 
-    depends_on = (
-        ('finance', '0001_move_finance'),
-    )
-
     def forwards(self, orm):
-        pass
+        db.rename_table(u'members_membershipcost', u'members_legacymembershipcost')
+        db.rename_table(u'members_membership', u'members_legacymembership')
+        # Adding model 'Membership'
+        db.create_table(u'members_membership', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('membership_name', self.gf('django.db.models.fields.CharField')(max_length=30)),
+            ('membership_description', self.gf('django.db.models.fields.TextField')(blank=True)),
+        ))
+        db.send_create_signal(u'members', ['Membership'])
+
 
     def backwards(self, orm):
-        pass
+        db.rename_table(u'members_legacymembershipcost', u'members_membershipcost')
+        db.delete_table(u'members_membership')
+        db.rename_table(u'members_legacymembership', u'members_membership')
 
-    complete_apps = ['members']
 
     models = {
         u'members.email': {
@@ -42,10 +51,16 @@ class Migration(SchemaMigration):
             'membership_description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'membership_name': ('django.db.models.fields.CharField', [], {'max_length': '30'})
         },
-        u'members.membershipcost': {
-            'Meta': {'ordering': "['valid_from']", 'object_name': 'MembershipCost'},
+        u'members.legacymembership': {
+            'Meta': {'object_name': 'LegacyMembership'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'membership': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['members.Membership']"}),
+            'membership_description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'membership_name': ('django.db.models.fields.CharField', [], {'max_length': '30'})
+        },
+        u'members.legacymembershipcost': {
+            'Meta': {'ordering': "['valid_from']", 'object_name': 'LegacyMembershipCost'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'membership': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['members.LegacyMembership']"}),
             'monthly_cost': ('django.db.models.fields.DecimalField', [], {'max_digits': '10', 'decimal_places': '2'}),
             'valid_from': ('django.db.models.fields.DateField', [], {})
         },
@@ -55,5 +70,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'member': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['members.Member']"}),
             'phone_number': ('django.db.models.fields.CharField', [], {'max_length': '20'})
-        },
+        }
     }
+
+    complete_apps = ['members']

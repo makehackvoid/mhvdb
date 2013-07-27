@@ -47,15 +47,16 @@ def balance(request):
     expenses = list(Expense.objects.all_expenses_for_period(date_from, date_to))
     income_items = list(Income.objects.filter(date__gte=date_from, date__lt=date_to))
     memberpayments = list(MemberPayment.objects.filter(date__gte=date_from, date__lt=date_to))
+    legacymemberpayments = list(LegacyMemberPayment.objects.filter(date__gte=date_from, date__lt=date_to))
 
-    income = sum(p.payment_value for p in memberpayments + income_items)
+    income = sum(p.payment_value for p in memberpayments + legacymemberpayments + income_items)
     expense = sum(e.payment_value for e in expenses)
 
     period_balance = income - expense
     start_balance = Expense.objects.balance_at_date(date_from)
     end_balance = period_balance + start_balance
 
-    items = sorted(expenses + memberpayments + income_items, key=lambda e:e.date)
+    items = sorted(expenses + memberpayments + income_items + legacymemberpayments, key=lambda e:e.date)
 
     return render_to_response('balance.html', locals())
 
@@ -81,7 +82,8 @@ def financial_report(request, year):
     income_by_category = {}
     for category in set(p.category for p in income_items):
         income_by_category[category] = sum(i.payment_value for i in income_items if i.category == category)
-    income_by_category["Membership Payments"] = sum(i.payment_value for i in MemberPayment.objects.filter(date__gte=date_from, date__lt=date_to))
+    income_by_category["Membership Payments"]  = sum(i.payment_value for i in MemberPayment.objects.filter(date__gte=date_from, date__lt=date_to))
+    income_by_category["Membership Payments"] += sum(i.payment_value for i in LegacyMemberPayment.objects.filter(date__gte=date_from, date__lt=date_to))
 
     income_total = sum(i for i in ( l for l in income_by_category.values() ))
 
