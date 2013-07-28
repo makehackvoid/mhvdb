@@ -1,0 +1,22 @@
+{% extends "../../core/templates/_base.html" %}
+
+{% block title %}Expiring Members{% endblock %}
+{% block heading %}Expiring Members{% endblock %}
+
+{% block extrahead %}
+    <style>
+        td i:hover {
+            text-decoration: none;
+        }
+
+        td.text-right {
+            text-align: right;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+{% include 'fragments/member_list.html' %}
+
+{% endblock %}

@@ -70,9 +70,7 @@ def expiring(request):
     members = [ m for m in members if m.membership_expiry_date() is not None and m.membership_expiry_date() < date.today() + timedelta(days=30) and m.membership_expiry_date() > date.today() - timedelta(days=60)] # expired, or expiring soon
     members = reversed(sorted(members, key=lambda m: m.membership_expiry_date()) )
 
-    show_summary = False
-    title = "Expiring Members"
-    return render_to_response("members.html", locals())
+    return render_to_response("expiring.html", locals())
 
 def expired(request):
     """
@@ -84,11 +82,11 @@ def expired(request):
 
     members = Member.objects.all().order_by("last_name")
     members = [ m for m in members if m.membership_expiry_date() is not None and m.membership_expiry_date() < date.today()]
-    members = reversed(sorted(members, key=lambda m: m.membership_expiry_date()) )
+    sorted(members, key=lambda m: m.membership_expiry_date()).reverse()
 
-    show_summary = False
-    title = "Expired Members"
-    return render_to_response("members.html", locals())
+    count = len(members)
+
+    return render_to_response("expired.html", locals())
 
 def previous_full_member(request):
     """

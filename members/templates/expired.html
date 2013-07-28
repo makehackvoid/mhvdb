@@ -1,0 +1,27 @@
+{% extends "../../core/templates/_base.html" %}
+
+{% block title %}Expired Members{% endblock %}
+{% block heading %}Expired Members{% endblock %}
+
+{% block extrahead %}
+    <style>
+        td i:hover {
+            text-decoration: none;
+        }
+
+        td.text-right {
+            text-align: right;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<p>
+{{count}} expired members of Make, Hack, Void.
+</p>
+
+<br>
+
+{% include 'fragments/member_list.html' %}
+
+{% endblock %}
