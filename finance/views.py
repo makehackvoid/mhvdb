@@ -5,26 +5,13 @@ from django.shortcuts import *
 
 from finance.models import *
 
+from core.decorators import auth_required
+
 # from django.views.generic.simple import direct_to_template
 from django.conf import settings
 import logging
-from ipaddr import IPNetwork, IPAddress
 
 logger = logging.getLogger(__name__)
-
-def is_local_or_authenticated(request):
-    """
-    Return True if the user is authenticated, or is on a 'local' network
-    as set under settings.LOCAL_IP_ADDRESSES
-    """
-    if request.user.is_authenticated():
-        return True
-    local_addrs = [ IPNetwork(addr) for addr in settings.LOCAL_IP_ADDRESSES ]
-    try:
-        remote = IPAddress(request.META["REMOTE_ADDR"])
-        return any( remote in a for a in local_addrs )
-    except:
-        return False
 
 def _parse_date(string, default):
     """ should probably be using Django Forms for all this """
@@ -33,13 +20,12 @@ def _parse_date(string, default):
     except ValueError:
         return default
 
+@auth_required
 def balance(request):
     """
     Display a balance sheet
     """
     navitem = 'finance'
-    if not is_local_or_authenticated(request):
-        return HttpResponseRedirect(settings.LOGIN_URL)
 
     date_from = _parse_date(request.GET.get("from", ""), date(2010,12,1))
     date_to = _parse_date(request.GET.get("to", ""), date.today())
@@ -66,14 +52,13 @@ def financial_reports(request):
     years = range(2010, date.today().year+1);
     return render_to_response('financial_reports.html', locals())
 
+@auth_required
 def financial_report(request, year):
     """
     Display something approximating an end of financial year report
     """
     year = int(year)
 
-    if not is_local_or_authenticated(request):
-        return HttpResponseRedirect(settings.LOGIN_URL)
 
     date_from = min(date(year,7,1), datetime.now().date())
     date_to = min(date(year+1,7,1), datetime.now().date())
