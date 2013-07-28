@@ -6,11 +6,11 @@ from finance.models import LegacyMemberPayment
 
 class PhoneInline(admin.StackedInline):
     model = Phone
-    extra = 1
+    extra = 0
 
 class EmailInline(admin.StackedInline):
     model = Email
-    extra = 1
+    extra = 0
 
 class PaymentInline(admin.TabularInline):
     model=LegacyMemberPayment
@@ -28,7 +28,7 @@ admin.site.register(Member, MemberAdmin)
 
 class MembershipCostInline(admin.TabularInline):
     model = LegacyMembershipCost
-    extra = 1
+    extra = 0
 
 class MembershipAdmin(admin.ModelAdmin):
     inlines = [ MembershipCostInline ]
