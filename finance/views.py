@@ -31,10 +31,10 @@ def balance(request):
     date_to = _parse_date(request.GET.get("to", ""), date.today())
 
     expenses = list(Expense.objects.all_expenses_for_period(date_from, date_to))
-    income_items = list(Income.objects.filter(date__gte=date_from, date__lt=date_to))
-    memberpayments = list(MemberPayment.objects.filter(date__gte=date_from, date__lt=date_to))
-    legacymemberpayments = list(LegacyMemberPayment.objects.filter(date__gte=date_from, date__lt=date_to))
-    expiringmemberpayments = list(ExpiringMemberPayment.objects.filter(date__gte=date_from, date__lt=date_to))
+    income_items = list(Income.objects.filter(date__gte=date_from, date__lte=date_to))
+    memberpayments = list(MemberPayment.objects.filter(date__gte=date_from, date__lte=date_to))
+    legacymemberpayments = list(LegacyMemberPayment.objects.filter(date__gte=date_from, date__lte=date_to))
+    expiringmemberpayments = list(ExpiringMemberPayment.objects.filter(date__gte=date_from, date__lte=date_to))
 
     income = sum(p.payment_value for p in memberpayments + legacymemberpayments + income_items)
     expense = sum(e.payment_value for e in expenses)
@@ -61,16 +61,16 @@ def financial_report(request, year):
 
 
     date_from = min(date(year,7,1), datetime.now().date())
-    date_to = min(date(year+1,7,1), datetime.now().date())
+    date_to = min(date(year+1,6,30), datetime.now().date())
 
     # income
-    income_items = list(Income.objects.filter(date__gte=date_from, date__lt=date_to))
+    income_items = list(Income.objects.filter(date__gte=date_from, date__lte=date_to))
     income_by_category = {}
     for category in set(p.category for p in income_items):
         income_by_category[category] = sum(i.payment_value for i in income_items if i.category == category)
-    income_by_category["Membership Payments"]  = sum(i.payment_value for i in MemberPayment.objects.filter(date__gte=date_from, date__lt=date_to))
-    income_by_category["Membership Payments"] += sum(i.payment_value for i in LegacyMemberPayment.objects.filter(date__gte=date_from, date__lt=date_to))
-    income_by_category["Membership Payments"] += sum(i.payment_value for i in ExpiringMemberPayment.objects.filter(date__gte=date_from, date__lt=date_to))
+    income_by_category["Membership Payments"]  = sum(i.payment_value for i in MemberPayment.objects.filter(date__gte=date_from, date__lte=date_to))
+    income_by_category["Membership Payments"] += sum(i.payment_value for i in LegacyMemberPayment.objects.filter(date__gte=date_from, date__lte=date_to))
+    income_by_category["Membership Payments"] += sum(i.payment_value for i in ExpiringMemberPayment.objects.filter(date__gte=date_from, date__lte=date_to))
 
     income_total = sum(i for i in ( l for l in income_by_category.values() ))
 
