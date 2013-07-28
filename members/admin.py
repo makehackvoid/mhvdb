@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from members.models import *
-from finance.models import LegacyMemberPayment
+from finance.models import LegacyMemberPayment, ExpiringMemberPayment
 
 
 class PhoneInline(admin.StackedInline):
@@ -26,12 +26,21 @@ class MemberAdmin(admin.ModelAdmin):
 
 admin.site.register(Member, MemberAdmin)
 
-class MembershipCostInline(admin.TabularInline):
+class LegacyMembershipCostInline(admin.TabularInline):
     model = LegacyMembershipCost
     extra = 0
 
-class MembershipAdmin(admin.ModelAdmin):
-    inlines = [ MembershipCostInline ]
-admin.site.register(LegacyMembership, MembershipAdmin)
+class LegacyMembershipAdmin(admin.ModelAdmin):
+    inlines = [ LegacyMembershipCostInline ]
+admin.site.register(LegacyMembership, LegacyMembershipAdmin)
+
+# starting to add expiring payments (not working)
+# class ExpiringMemberPaymentInline(admin.TabularInline):
+#     model = ExpiringMemberPayment
+#     extra = 0
+
+# class ExpiringMemberPaymentAdmin(admin.ModelAdmin):
+#     inlines = [ ExpiringMemberPaymentInline ]
+# admin.site.register(ExpiringMemberPaymentAdmin)
 
 admin.site.register(Membership)
