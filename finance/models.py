@@ -56,7 +56,9 @@ class ExpenseManager(models.Manager):
         expenses = list(Expense.objects.all_expenses_for_period(date(2010,1,1), at_date))
         income = list(Income.objects.filter(date__lt=at_date))
         memberpayments = list(MemberPayment.objects.filter(date__lt=at_date))
-        return sum(p.payment_value for p in memberpayments + income) - sum(e.payment_value for e in expenses)
+        legacymemberpayments = list(LegacyMemberPayment.objects.filter(date__lt=at_date))
+        expiringmemberpayments = list(ExpiringMemberPayment.objects.filter(date__lt=at_date))
+        return sum(p.payment_value for p in memberpayments + legacymemberpayments + expiringmemberpayments + income) - sum(e.payment_value for e in expenses)
 
 
 class ExpenseCategory(models.Model):
