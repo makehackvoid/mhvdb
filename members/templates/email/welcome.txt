@@ -1,15 +1,25 @@
 Hi {{m.first_name}},
 
-Welcome to MHV! Your new annual membership payment has just been entered into our system. If you paid some time ago then our apologies - our staff are all volunteers.
+Welcome to MHV! I've received your membership payment. Your membership is valid through to {{m.expiry_date}}.
 
-Your membership type is listed in our system as "{{m.member_type}}". Your membership will expire {{m.expiry_date}}.
+I look forward to seeing you at the MHV Space. Make sure you ask someone to show you around if you don't already know where everything is and how to use it. If you can't make it into the space, we have lots of online places you can join in;
 
-We'll send you a reminder email when your membership expiry is two weeks away. You can renew at any time.
+ - the MHV website (http://makehackvoid.com)
+ - MHV wiki (http://space.makehackvoid.com/wiki)
+ - the mailing lists (http://www.makehackvoid.com/community/mailing-lists)
+ - facebook group (https://www.facebook.com/groups/357947732276/)
+ - G+ (https://plus.google.com/115335799936532561135/posts)
+ - twitter (https://twitter.com/MakeHackVoid)
+ - github (https://github.com/makehackvoid/)
+ - irc (http://www.makehackvoid.com/community/irc-channel)
 
-If anything in this email seems incorrect, please reply and let us know.
-
-If you'd like to know when the space will be open, check the google calendar on the web site: http://www.makehackvoid.com/
-
-and also make sure to join the "Announcements" mailing list: http://www.makehackvoid.com/community/mailing-lists
+If you'd like to know when the space will be open, check the google calendar on the web site or join the announcement mailing list.
 
 Hope to see you in the space soon. Happy hacking!
+
+Please ask me if you have any questions or need any help in getting started.
+
+regards,
+
+Brenda
+Treasurer, MakeHackVoid

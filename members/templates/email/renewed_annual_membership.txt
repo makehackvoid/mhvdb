@@ -1,11 +1,5 @@
 Hi {{m.first_name}},
 
-Thanks for renewing your MHV annual membership! This email is just to let you know that your membership has been processed by an MHV volunteer.
-
-We have your membership type listed in our system as "{{m.member_type}}". Your membership will now expire {{m.expiry_date}}.
-
-We'll send you a reminder email when your membership expiry is two weeks away.
-
-If anything in this email seem incorrect, please reply and let us know.
+Thanks for renewing your MHV annual membership! Your membership is valid through to {{m.expiry_date}}.
 
 Hope to see you in the space soon. Happy hacking!

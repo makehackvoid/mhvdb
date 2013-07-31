@@ -1,13 +1,9 @@
 Hi {{m.first_name}},
 
-Your MHV Annual membership expired today. :(
+Your MHV annual membership expired today. :(
 
 If you believe this is wrong, or have already paid, please reply to this email and so we can sort it out.
 
-You're still welcome to come to Maker Meetup events.
+You are still welcome to come to Maker Meetup events.
 
-If you want to continue your membership, current membership rates and payment details can be found at:
-
-http://www.makehackvoid.com/community/membership
-
-You can make a bank transfer with your annual membership fee and any access payments you want to make, and then reply to this email and let us know so we can enter the payment into our system.
+Please continue your support of MHV by making a bank transfer with your annual membership fee $50 ($30 concession) and any access payments you want to make.
