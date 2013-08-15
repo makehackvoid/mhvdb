@@ -194,16 +194,19 @@ EMAIL_PORT = 25
 
 EMAIL_SENDER = "treasurer@makehackvoid.com"
 
-EXPIRING_DAYS = 14 # warn the member when their membership expires this many days away
+EXPIRING_DAYS = 7 # warn the member when their membership expires this many days away
 EXPIRING_INTERNAL_DAYS = 3 # warn the treasurer when a member's membership expires this many days away
 
 EMAIL_SUBJECTS = {
     "welcome.txt"  : "Welcome to Make, Hack, Void!",
-    "renewed.txt" : "Make, Hack, Void membership has renewed",
-    "expiring.txt" : "Make, Hack, Void membership expires soon",
-    "expired.txt"  : "Make, Hack, Void membership has expired",
-    "internal.txt" : "MHV membership is about to expire!"
-}
+    "renewed_annual_membership.txt" : "Make, Hack, Void membership has renewed",
+    "expiring_membership.txt" : "Make, Hack, Void membership expires soon",
+    "expired_membership.txt"  : "Make, Hack, Void membership has expired",
+    "expiring_key.txt" : "Make, Hack, Void key holder expires soon",
+    "expired_key.txt"  : "Make, Hack, Void key holder has expired",
+    "expiring_monthly_access.txt" : "Make, Hack, Void monthly access expires soon",
+    "expired_monthly_access.txt"  : "Make, Hack, Void monthly has expired",
+    "internal.txt" : "MHV membership is about to expire!"}
 
 EMAIL_CC = {
     "expired.txt" : [ EMAIL_SENDER ],
