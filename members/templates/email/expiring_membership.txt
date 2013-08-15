@@ -1,8 +1,8 @@
 Hi {{m.first_name}},
 
-This is a quick automated email to let you know that your old-style MHV membership is due to expire {{m.expiry_date}}.
+This is a quick automated email to let you know that your MHV membership expires on {{m.membership_expiry_date}}.
 
-The new membership and access rates and payment details can be found at:
+The latest membership and access rates and payment details can be found at:
 
 http://www.makehackvoid.com/community/membership
 

@@ -1,5 +1,5 @@
 Hi {{m.first_name}},
 
-Thanks for renewing your MHV annual membership! Your membership is valid through to {{m.expiry_date}}.
+Thanks for renewing your MHV annual membership! Your membership is valid through to {{m.membership.expiry_date}}.
 
-Hope to see you in the space soon. Happy hacking!
+Hope to see you in the space again soon. Happy hacking!

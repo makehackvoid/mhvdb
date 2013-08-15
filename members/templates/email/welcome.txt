@@ -1,6 +1,6 @@
 Hi {{m.first_name}},
 
-Welcome to MHV! I've received your membership payment. Your membership is valid through to {{m.expiry_date}}.
+Welcome to MHV! I've received your membership payment. Your membership is valid through to {{m.membership_expiry_date}}.
 
 I look forward to seeing you at the MHV Space. Make sure you ask someone to show you around if you don't already know where everything is and how to use it. If you can't make it into the space, we have lots of online places you can join in;
 

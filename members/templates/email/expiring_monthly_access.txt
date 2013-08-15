@@ -1,0 +1,11 @@
+Hi {{m.first_name}},
+
+This is a quick automated email to let you know that your MHV monthly access expires on {{m.access_expiry_date}}.
+
+You are still welcome to come to Maker Meetup events and to come in and pay for individual visits.
+
+The latest access rates and payment details can be found at:
+
+http://www.makehackvoid.com/community/membership
+
+You can continue your monthly (unlimited visits) access by making a bank transfer with of $60 ($35 concession).

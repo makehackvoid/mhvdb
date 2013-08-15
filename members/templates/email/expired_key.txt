@@ -1,0 +1,14 @@
+Hi {{m.first_name}},
+
+Your MHV key holder fee has expired :(
+
+If you don't want to keep your key, please return it to the space.
+
+The latest access rates and payment details can be found at:
+
+http://www.makehackvoid.com/community/membership
+
+You can keep your key by making a bank transfer of whichever key holder option you prefer:
+
+6 months      $130 ($80 concession)
+12 months     $240 ($130 concession)

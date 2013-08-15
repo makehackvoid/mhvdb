@@ -1,0 +1,11 @@
+Hi {{m.first_name}},
+
+Your MHV monthly access expired today. :(
+
+You are still welcome to come to Maker Meetup events and to come in and pay for individual visits.
+
+The latest access rates and payment details can be found at:
+
+http://www.makehackvoid.com/community/membership
+
+You can continue your monthly (unlimited visits) access by making a bank transfer with of $60 ($35 concession).
