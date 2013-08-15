@@ -8,13 +8,14 @@ from members.models import *
 # Run this command once a day to send "expiring soon" and "just expired" warnings to members
 
 def send_expiry_emails(m, date, expiring, expired, internal):
-    days = ( date - date.today() ).days
-    if days == settings.EXPIRING_DAYS:
-        m.send_email(expiring)
-    elif days == -1:
-        m.send_email(expired)
-    elif days == settings.EXPIRING_INTERNAL_DAYS:
-        m.send_email(internal, False)
+    if date != None:
+        days = ( date - date.today() ).days
+        if days == settings.EXPIRING_DAYS:
+            m.send_email(expiring)
+        elif days == -1:
+            m.send_email(expired)
+        elif days == settings.EXPIRING_INTERNAL_DAYS:
+            m.send_email(internal, False)
 
 class Command(BaseCommand):
     def handle(self, *args, **kw):
