@@ -1,7 +1,9 @@
 Reminder of an upcoming member expiry:
 
-{{m.first_name}} {{m.last_name}} {{m.expiry_date}}
+{{m.first_name}} {{m.last_name}} 
 
-Please check the bank account to make sure they haven't paid, or they
-will be wrongly told that their membership has expired!
+Membership Expiry Date: {{m.membership_expiry_date}}
+Access Expiry Date: {{m.access_expiry_date}}
+Key Expiry Date: {{m.key_expiry_date}}
 
+Please check the bank account to make sure they haven't paid.
