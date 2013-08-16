@@ -55,7 +55,33 @@ def expiring(request):
     members = Member.objects.all().order_by("last_name")
     members = [ m for m in members if m.membership_expiry_date() is not None and m.membership_expiry_date() < date.today() + timedelta(days=30) and m.membership_expiry_date() > date.today() - timedelta(days=60)] # expired, or expiring soon
     members = reversed(sorted(members, key=lambda m: m.membership_expiry_date()) )
+    expiry_type = "Expiring Members"
+    return render_to_response("expiring.html", locals())
 
+@auth_required
+def expiring_key(request):
+    """
+    Display members with keys expiring soon, in order of soonness
+    """
+    navitem = 'members'
+
+    members = Member.objects.all().order_by("last_name")
+    members = [ m for m in members if m.key_expiry_date() is not None and m.key_expiry_date() < date.today() + timedelta(days=30) and m.key_expiry_date() > date.today() - timedelta(days=60)] # expired, or expiring soon
+    members = reversed(sorted(members, key=lambda m: m.key_expiry_date()) )
+    expiry_type = "Members with expiring keys"
+    return render_to_response("expiring.html", locals())
+
+@auth_required
+def expiring_access(request):
+    """
+    Display members with access expiring soon, in order of soonness
+    """
+    navitem = 'members'
+
+    members = Member.objects.all().order_by("last_name")
+    members = [ m for m in members if m.access_expiry_date() is not None and m.access_expiry_date() < date.today() + timedelta(days=30) and m.access_expiry_date() > date.today() - timedelta(days=60)] # expired, or expiring soon
+    members = reversed(sorted(members, key=lambda m: m.access_expiry_date()) )
+    expiry_type = "Members with expiring monthly access"
     return render_to_response("expiring.html", locals())
 
 @auth_required
