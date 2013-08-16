@@ -27,7 +27,7 @@ def balance(request):
     """
     navitem = 'finance'
 
-    date_from = _parse_date(request.GET.get("from", ""), date(2010,12,1))
+    date_from = _parse_date(request.GET.get("from", ""), min(date(date.today().year,7,1), datetime.now().date()))
     date_to = _parse_date(request.GET.get("to", ""), date.today())
 
     expenses = list(Expense.objects.all_expenses_for_period(date_from, date_to))
