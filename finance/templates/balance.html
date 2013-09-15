@@ -81,7 +81,7 @@
 		<th class='span2'><a href="{% url 'finance.views.balance' %}">Paid Via</a></th>
 	 </tr>
 	 {% for item in items %}
-	 <tr class='{% if item in expenses %}error{% elif item in memberpayments or item in legacymemberpayments %}info{% else %}success{% endif %}'>
+   <tr class='{% if item in expenses %}error{% elif item in memberpayments or item in legacymemberpayments or "Access" in item.product%}info{% else %}success{% endif %}'>
 		<td>{{item.date}}</td>
 		{% if item in expenses %}
 		<td class='text-right'>-${{item.payment_value|floatformat:2|intcomma}}</td>
@@ -90,9 +90,11 @@
 		{% else %} {# is payment or donation #}
 		<td class='text-right'>${{item.payment_value|floatformat:2|intcomma}}</td>
 		{% if item in memberpayments %}
-		<td>Membership {{item.membership}} from {{item.member}}</td>
+		<td>{{item.product}} from {{item.member}}</td>
 		{% elif item in legacymemberpayments %}
-		<td>Membership {{item.membership}} from {{item.member}} (Legacy)</td>
+		<td>{{item.product}} {{item.membership}} from {{item.member}}</td>
+    {% elif item in expiringmemberpayments %}
+    <td>{{item.product}} from {{item.member}}</td>
 		{% else %} {# donation #}
 		<td>Donation: {{item.description}}</td>
 		  {% endif %}

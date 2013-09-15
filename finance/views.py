@@ -36,7 +36,7 @@ def balance(request):
     legacymemberpayments = list(LegacyMemberPayment.objects.filter(date__gte=date_from, date__lte=date_to))
     expiringmemberpayments = list(ExpiringMemberPayment.objects.filter(date__gte=date_from, date__lte=date_to))
 
-    income = sum(p.payment_value for p in memberpayments + legacymemberpayments + income_items)
+    income = sum(p.payment_value for p in memberpayments + legacymemberpayments + income_items + expiringmemberpayments)
     expense = sum(e.payment_value for e in expenses)
 
     period_balance = income - expense
