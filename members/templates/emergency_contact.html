@@ -15,5 +15,11 @@
 <p>
 {{member.emergency_contact_number}}
 </p>
+<h2>Medical Information</h2>
+{%if member.medical_info and member.medical_info.strip %}
+<p>{{member.medical_info}}</p>
+{% else %}
+<p>No information provided.</p>
+{% endif %}
 
 {% endblock %}
