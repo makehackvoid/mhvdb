@@ -167,6 +167,18 @@ class Member(models.Model):
                     return True
         return False
 
+    def member_email(self):
+        emails = list(self.email_set.all())
+        recipients = [ e.email for e in emails if e.is_preferred ]
+        if len(recipients) == 0:
+            recipients = [ e.email for e in emails ]
+        return recipients
+
+    def member_phone(self):
+        phone_numbers = list(self.phone_set.all())
+
+        return phone_numbers[0].phone_number
+
     def send_email(self, template, send_to_member=True):
         """
         Send the member an email, using the specified template for content

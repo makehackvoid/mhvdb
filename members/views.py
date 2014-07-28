@@ -1,3 +1,6 @@
+import csv
+from django.http import HttpResponse
+
 from datetime import date
 from datetime import datetime
 
@@ -44,6 +47,38 @@ def members(request):
 
     count = len(members)
     return render_to_response("members.html", locals())
+
+@auth_required
+def members_csv(request):
+    """
+    Display the list of members
+    """
+    navitem = 'members'
+
+    members = Member.objects.all().order_by("last_name")
+    sortby = { # is not possible to sort in the query as expiry/type are not DB fields
+        'name'   : lambda m: ("%s %s" % (m.last_name, m.first_name)).lower(),
+        'expiry' : lambda m: m.membership_expiry_date(),
+        'join'   : lambda m: m.join_date,
+        'type'   : lambda m: m.member_type().membership_name
+    }[request.GET.get('sort', 'name')]
+    members = filter(lambda x: x.member_type().membership_name != settings.DEFAULT_MEMBERSHIP_NAME, members)
+    members = sorted(members, key=sortby)
+
+    # show_summary = True
+    # count how many of each member type we have
+    # alltypes = [m.member_type() for m in members]
+    # counts = sorted([(a, alltypes.count(a)) for a in set(alltypes)], key=lambda x: x[0])
+
+    # count = len(members)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="mhvdb_members.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['fullname', 'membership_expiry_date', 'join_date', 'key_expiry_date', 'member_id', 'phone', 'member_email'])
+    for m in members:
+        writer.writerow([m.fullname(), m.membership_expiry_date(), m.join_date, m.key_expiry_date(), m.id, m.member_phone(), m.member_email()])
+    return response
 
 @auth_required
 def expiring(request):
