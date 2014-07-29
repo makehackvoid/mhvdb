@@ -176,8 +176,11 @@ class Member(models.Model):
 
     def member_phone(self):
         phone_numbers = list(self.phone_set.all())
-
-        return phone_numbers[0].phone_number
+        if len(phone_numbers) > 0:
+            phone_number = phone_numbers[0].phone_number
+        else:
+            phone_number = ''
+        return phone_number
 
     def send_email(self, template, send_to_member=True):
         """

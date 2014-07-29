@@ -51,9 +51,9 @@ def members(request):
 @auth_required
 def members_csv(request):
     """
-    Display the list of members
+    Export members as csv file
     """
-    navitem = 'members'
+    navitem = 'members_csv'
 
     members = Member.objects.all().order_by("last_name")
     sortby = { # is not possible to sort in the query as expiry/type are not DB fields
@@ -62,15 +62,8 @@ def members_csv(request):
         'join'   : lambda m: m.join_date,
         'type'   : lambda m: m.member_type().membership_name
     }[request.GET.get('sort', 'name')]
-    members = filter(lambda x: x.member_type().membership_name != settings.DEFAULT_MEMBERSHIP_NAME, members)
+    # members = filter(lambda x: x.member_type().membership_name != settings.DEFAULT_MEMBERSHIP_NAME, members)
     members = sorted(members, key=sortby)
-
-    # show_summary = True
-    # count how many of each member type we have
-    # alltypes = [m.member_type() for m in members]
-    # counts = sorted([(a, alltypes.count(a)) for a in set(alltypes)], key=lambda x: x[0])
-
-    # count = len(members)
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="mhvdb_members.csv"'
 
