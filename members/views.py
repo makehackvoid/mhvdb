@@ -53,7 +53,7 @@ def members_csv(request):
     """
     Export members as csv file
     """
-    navitem = 'members_csv'
+    navitem = 'members'
 
     members = Member.objects.all().order_by("last_name")
     sortby = { # is not possible to sort in the query as expiry/type are not DB fields
